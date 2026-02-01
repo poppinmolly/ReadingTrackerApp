@@ -1,5 +1,6 @@
 package com.example.readingtrackerapp.presentation.screens.Explore
 
+import android.util.Log
 import retrofit2.HttpException
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -10,6 +11,9 @@ import com.example.readingtrackerapp.domain.model.Book
 import com.example.readingtrackerapp.domain.usecase.GetBookUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import androidx.compose.runtime.State
+import kotlinx.coroutines.withTimeout
+
 
 import javax.inject.Inject
 
@@ -28,31 +32,36 @@ class ExploreScreenViewModel @Inject constructor(
     var error by mutableStateOf<String?>(null)
         private set
 
-    fun searchBook(){
+    private val _books = mutableStateOf<List<Book>>(emptyList())
+    val books: State<List<Book>> = _books
+
+    fun searchBook() {
+
         val query = stateText
             .trim()
-            .replace(" ", "+")
+
         if (query.isEmpty()) return
 
         viewModelScope.launch {
+            error = null
             try {
-                val books = getBookUseCase(query)
-                println(books.forEach {
-                    println(it.authors)
-                })
-            } catch (e: HttpException){
-                if (e.code() == 429){
+                val result = getBookUseCase(query)
+
+                _books.value = result
+                Log.d("ExploreVM", "state books now = ${_books.value.size}")
+
+            } catch (e: HttpException) {
+                if (e.code() == 429) {
+
                     error = "Too many requests. Please wait."
                 }
-            } catch (e: Exception){
+            } catch (e: Exception) {
                 error = "Something went wrong"
-            }finally {
+            } finally {
                 _stateText = ""
-            }
 
+            }
         }
     }
-
-
 
 }

@@ -7,6 +7,7 @@ import com.example.readingtrackerapp.domain.model.Book
 import com.example.readingtrackerapp.domain.repository.BookRepository
 import javax.inject.Inject
 
+
 class BookRepositoryImpl @Inject constructor(
     val dataSource: BooksRemoteDataSource
 ): BookRepository {
