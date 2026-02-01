@@ -62,7 +62,16 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 
-    // NAVIGATION
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+
+
+    // Room
+    implementation("androidx.room:room-runtime:2.6.1")
+    implementation("androidx.room:room-ktx:2.6.1")
+    kapt("androidx.room:room-compiler:2.6.1")
+
+    // Navigation
     val nav_version = "2.9.7"
     implementation("androidx.navigation:navigation-compose:$nav_version")
 
@@ -72,4 +81,7 @@ dependencies {
     // Hilt
     implementation("com.google.dagger:hilt-android:2.51")
     kapt("com.google.dagger:hilt-compiler:2.51")
+
+    // Retrofit
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
 }

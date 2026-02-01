@@ -40,3 +40,7 @@ val lightGreen = Color(0xFF22C55E)
 
 val colorBackgroundDefault = Color(0xFFFAF8FF)
 
+val mintBg = Color(0xFFF0FDF4)
+
+val errorRedColor = Color(0xFFFDAFAF)
+

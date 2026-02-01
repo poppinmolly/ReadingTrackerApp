@@ -169,6 +169,7 @@ fun ReadingScreen(){
                         fontSize = 15.sp,
                         fontFamily = roboto,
                         modifier = Modifier.offset(x = 5.dp)
+                        
                     )
                 }
 

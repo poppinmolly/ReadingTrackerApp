@@ -5,10 +5,8 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import com.example.readingtrackerapp.presentation.screens.Explore.ExploreScreen
-import com.example.readingtrackerapp.presentation.screens.Home.HomeScreen
-import com.example.readingtrackerapp.presentation.screens.Home.HomeScreenUi
+import com.example.readingtrackerapp.presentation.screens.Explore.ExploreScreenUi
 import com.example.readingtrackerapp.presentation.screens.Home.HomeTabScreen
 import com.example.readingtrackerapp.presentation.screens.Profile.ProfileScreen
 import com.example.readingtrackerapp.presentation.screens.Reading.ReadingScreen

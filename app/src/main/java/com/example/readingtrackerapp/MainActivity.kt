@@ -7,7 +7,9 @@ import androidx.activity.enableEdgeToEdge
 import com.example.readingtrackerapp.presentation.screens.Home.HomeScreen
 import com.example.readingtrackerapp.presentation.screens.Home.HomeScreenUi
 import com.example.readingtrackerapp.ui.theme.ReadingTrackerAppTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
