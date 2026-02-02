@@ -1,11 +1,11 @@
 package com.example.readingtrackerapp.presentation.screens.Home
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -23,12 +25,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemColors
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,16 +38,17 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import coil.compose.AsyncImage
 import com.example.readingtrackerapp.R
+import com.example.readingtrackerapp.data.local.entity.BookDetail
 import com.example.readingtrackerapp.presentation.navigation.AppNavHost
 import com.example.readingtrackerapp.presentation.navigation.Destination
 import com.example.readingtrackerapp.ui.theme.backgroundButton
@@ -53,7 +56,6 @@ import com.example.readingtrackerapp.ui.theme.buttonGradient
 import com.example.readingtrackerapp.ui.theme.cardGradientGreen
 import com.example.readingtrackerapp.ui.theme.colorBackgroundDefault
 import com.example.readingtrackerapp.ui.theme.fontGrayColor
-import com.example.readingtrackerapp.ui.theme.lightGray
 import com.example.readingtrackerapp.ui.theme.lightGreen
 import com.example.readingtrackerapp.ui.theme.roboto
 import com.example.readingtrackerapp.ui.theme.robotoMedium
@@ -123,7 +125,9 @@ fun HomeScreenUi(
 }
 
 @Composable
-fun HomeTabScreen() {
+fun HomeTabScreen(
+    vm: HomeScreenViewModel = hiltViewModel()
+) {
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -132,8 +136,11 @@ fun HomeTabScreen() {
 
 
         Main()
-        ReadingText()
-        ReadingBookCard()
+        ReadingText(vm.booksReadingCounter.toString())
+        LaunchedEffect(Unit) {
+            vm.getAllReadingBooks()
+        }
+        LazyColumnOfBooks(vm.readingBooksAtNow.value)
     }
 }
 
@@ -431,10 +438,12 @@ fun ProgressBar(
     }
 }
 @Composable
-fun ReadingText(){
+fun ReadingText(
+    readingBooks: String
+){
     Row(modifier = Modifier
         .fillMaxWidth()
-        .padding(horizontal = 15.dp, vertical = 15.dp),
+        .padding(start = 15.dp, top = 10.dp, end = 15.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,) {
         Text(
@@ -444,16 +453,45 @@ fun ReadingText(){
         )
 
         Text(
-            text = "3 books",
+            text = "$readingBooks books",
             fontSize = 14.sp,
             fontFamily = roboto,
             color = lightGreen,
         )
     }
 }
-@Preview
+
 @Composable
-fun ReadingBookCard(){
+fun LazyColumnOfBooks(books: List<BookDetail>){
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.TopCenter,
+
+        ) {
+        LazyColumn(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            contentPadding = PaddingValues(vertical = 16.dp)
+        ) {
+            items(
+                items = books,
+                key = { it.id }
+            ) { book ->
+                ReadingBookCard(book)
+            }
+        }
+    }
+}
+
+
+
+@Composable
+fun ReadingBookCard(book: BookDetail){
+    val progress = calculateProgress(
+        total = book.totalTitles,
+        current = book.readTitle
+    )
     Surface(
         modifier = Modifier
             .fillMaxWidth(0.95f)
@@ -468,26 +506,19 @@ fun ReadingBookCard(){
             verticalAlignment = Alignment.CenterVertically,
 
         ) {
-            Image(
-                painter = painterResource(R.drawable.img_test),
-                contentDescription = null,
-                modifier = Modifier
-                    .size(height = 80.dp, width = 60.dp)
-                    .clip(RoundedCornerShape(15.dp)),
-                contentScale = ContentScale.Crop,
-            )
+            BookCover(book.thumbnail)
             Spacer(modifier = Modifier.width(10.dp))
 
             Column(
                 verticalArrangement = Arrangement.Bottom,
             ) {
-                Text(text = "Five Survive",
+                Text(text = book.bookTitle,
                     fontFamily = robotoMedium,
                     fontSize = 17.sp,
 
                 )
 
-                Text(text = "Holly Jackson",
+                Text(text = book.bookAuthor,
                     fontFamily = roboto,
                     fontSize = 14.sp,
                     color = slateGray,
@@ -497,13 +528,16 @@ fun ReadingBookCard(){
                     modifier = Modifier.fillMaxWidth(0.95f),
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
-                    Text(text = "Page 187 of 304",
+                    Text(text = "Page ${book.readTitle} of ${book.totalTitles}",
                         fontFamily = roboto,
                         fontSize = 13.sp,
                         color = slateGray,
                     )
 
-                    Text(text = "62%",
+                    Text(text = calculatePercent(
+                        atNow = book.readTitle,
+                        total = book.totalTitles
+                    ),
                         fontFamily = roboto,
                         fontSize = 13.sp,
                         color = lightGreen,
@@ -519,7 +553,7 @@ fun ReadingBookCard(){
                 ){
                     Box(modifier = Modifier
                         .fillMaxHeight()
-                        .fillMaxWidth(0.67f)
+                        .fillMaxWidth(progress)
                         .clip(shape = RoundedCornerShape(40.dp))
                         .background(lightGreen)
                     )
@@ -529,7 +563,25 @@ fun ReadingBookCard(){
     }
 }
 
-@Composable
-fun BottomBar(){
 
+fun calculatePercent(atNow: Int, total: Int):String{
+    return ((atNow/total) * 100).toString() + "%"
+}
+
+fun calculateProgress(current: Int, total: Int): Float {
+    return if (total > 0) {
+        (current / total.toFloat()).coerceIn(0f, 1f)
+    } else 0f
+}
+
+@Composable
+fun BookCover(url: String) {
+    AsyncImage(
+        model = url,
+        contentDescription = "Book cover",
+        modifier = Modifier
+            .size(height = 80.dp, width = 60.dp)
+            .clip(RoundedCornerShape(15.dp))
+
+    )
 }

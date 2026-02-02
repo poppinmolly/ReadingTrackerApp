@@ -8,7 +8,11 @@ data class BookDetail(
     @PrimaryKey (autoGenerate = true)
     val id: Long,
     val bookTitle: String,
-    val readTitle: Int,
+    val bookAuthor: String,
+    val readTitle: Int = 0,
+    val apiId: String,
+    val thumbnail: String,
     val totalTitles: Int,
+    val timeReading: Int = 0,
 
 )

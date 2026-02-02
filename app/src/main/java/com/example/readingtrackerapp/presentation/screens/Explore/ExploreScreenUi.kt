@@ -1,8 +1,7 @@
 package com.example.readingtrackerapp.presentation.screens.Explore
 
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -10,11 +9,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -23,8 +20,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonColors
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -36,27 +31,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 
 import com.example.readingtrackerapp.R
 import com.example.readingtrackerapp.domain.model.Book
-import com.example.readingtrackerapp.ui.theme.backgroundButton
 import com.example.readingtrackerapp.ui.theme.colorBackgroundDefault
 import com.example.readingtrackerapp.ui.theme.errorRedColor
-import com.example.readingtrackerapp.ui.theme.fontGrayColor
-import com.example.readingtrackerapp.ui.theme.lightGray
 import com.example.readingtrackerapp.ui.theme.lightGreen
 import com.example.readingtrackerapp.ui.theme.mintBg
 import com.example.readingtrackerapp.ui.theme.roboto
-import com.example.readingtrackerapp.ui.theme.robotoMedium
 import com.example.readingtrackerapp.ui.theme.robotoSemiBold
 import com.example.readingtrackerapp.ui.theme.slateGray
 import com.example.readingtrackerapp.ui.theme.stroke
@@ -70,7 +58,9 @@ fun ExploreScreen(
         onTextChange = vm::onTextChange,
         onClickButton = vm::searchBook,
         textError = vm.error,
-        books = vm.books.value
+        books = vm.books.value,
+        onClickAddButton = vm::addBookToReadList,
+        booksAdded = vm.booksAdded
     )
 }
 
@@ -82,6 +72,8 @@ fun ExploreScreenUi(
     onClickButton: () -> Unit,
     textError: String?,
     books: List<Book>,
+    onClickAddButton: (Book) -> Unit,
+    booksAdded: List<String>
 ){
     Column(
         modifier = Modifier
@@ -154,7 +146,7 @@ fun ExploreScreenUi(
             when {
                 textError != null -> ErrorScreen(Modifier.align(Alignment.Center), textError)
                 books.isEmpty() -> CenterOfScreenUi(Modifier.align(Alignment.Center))
-                else -> BooksList(books)
+                else -> BooksList(books, onClickAddButton, booksAdded)
             }
 
 
@@ -168,7 +160,7 @@ fun ExploreScreenUi(
 }
 
 @Composable
-fun BooksList(books: List<Book>) {
+fun BooksList(books: List<Book>, onClickButton: (Book) -> Unit, booksAdded: List<String>) {
     Spacer(modifier = Modifier.height(20.dp))
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -185,7 +177,11 @@ fun BooksList(books: List<Book>) {
                 items = books,
                 key = { it.id }
             ) { book ->
-                SearchBookCard(book)
+                SearchBookCard(
+                    book,
+                    onClickAddButton = {onClickButton(book)},
+                    booksAdded.contains(book.id)
+                )
             }
         }
     }
@@ -291,62 +287,86 @@ fun ErrorScreen(
 }
 
 @Composable
-fun SearchBookCard(book: Book){
+fun SearchBookCard(
+    book: Book,
+    onClickAddButton :()-> Unit,
+    isAdded: Boolean,
+){
     Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .height(100.dp)
-            .clip(shape = RoundedCornerShape(12.dp))
-            .border(1.dp, stroke, shape = RoundedCornerShape(12.dp)),
-
+            .height(100.dp),
+        shape = RoundedCornerShape(12.dp),
+        border = BorderStroke(1.dp, stroke)
+    ) {
+        Box(
+            modifier = Modifier.fillMaxSize()
         ) {
-        Row(modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 5.dp),
-            verticalAlignment = Alignment.CenterVertically,
 
+
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 8.dp, vertical = 6.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
 
-            BookCover(book.thumbnail?:"https://png.klev.club/uploads/posts/2024-04/png-klev-club-7ues-p-voprositelnii-belii-znak-png-14.png")
-            Spacer(modifier = Modifier.width(10.dp))
+                BookCover(
+                    book.thumbnail ?: "https://..."
+                )
 
-            Column(
-                verticalArrangement = Arrangement.Bottom,
-            ) {
-                Text(text = book.title?:"Unknown",
-                    fontFamily = robotoSemiBold,
-                    fontSize = 17.sp,
+                Spacer(modifier = Modifier.width(10.dp))
 
-                    )
-
-                Text(text = book.authors?:"Unknown",
-                    fontFamily = roboto,
-                    fontSize = 14.sp,
-                    color = slateGray,
-
-                    )
-                Spacer(Modifier.height(5.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(0.95f),
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_star),
-                        contentDescription = null,
-                        modifier = Modifier.size(15.dp),
-                        tint = Color.Unspecified,
-                    )
-                    Spacer(modifier = Modifier.width(3.dp))
-
-                    Text(text = book.averageRating.toString(),
+                Column {
+                    Text(
+                        text = book.title ?: "Unknown",
                         fontFamily = robotoSemiBold,
-                        fontSize = 15.sp,
-                        color = Color.Black,
-                        modifier = Modifier.offset(y = 1.dp)
+                        fontSize = 17.sp
                     )
-                }
 
+                    Text(
+                        text = book.authors ?: "Unknown",
+                        fontFamily = roboto,
+                        fontSize = 14.sp,
+                        color = slateGray
+                    )
+
+                    Spacer(Modifier.height(5.dp))
+
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_star),
+                            contentDescription = null,
+                            modifier = Modifier.size(15.dp),
+                            tint = Color.Unspecified
+                        )
+                        Spacer(Modifier.width(3.dp))
+                        Text(
+                            text = book.averageRating.toString(),
+                            fontFamily = robotoSemiBold,
+                            fontSize = 15.sp
+                        )
+                    }
+                }
+            }
+
+
+            Box(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(top = 13.dp, end = 13.dp)
+                    .size(39.dp)
+                    .clip(RoundedCornerShape(13.dp))
+                    .background(if (isAdded) lightGreen.copy(0.4f) else lightGreen)
+                    .clickable(onClick = onClickAddButton),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    painter = painterResource(if (isAdded) R.drawable.ic_check else R.drawable.ic_add),
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp),
+                    tint = Color.White
+                )
             }
         }
     }
