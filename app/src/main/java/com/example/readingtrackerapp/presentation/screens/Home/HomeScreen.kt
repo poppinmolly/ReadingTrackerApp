@@ -1,5 +1,6 @@
 package com.example.readingtrackerapp.presentation.screens.Home
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -19,9 +20,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -31,9 +36,11 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarDefaults
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -45,11 +52,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -143,7 +152,7 @@ fun HomeTabScreen(
     vm: HomeScreenViewModel = hiltViewModel()
 ) {
     val sheetState = rememberModalBottomSheetState()
-    var showBottomSheet by remember { mutableStateOf(false) }
+
 
     val isSelected by vm.selectedBook
     Column(
@@ -161,11 +170,11 @@ fun HomeTabScreen(
         LazyColumnOfBooks(vm.readingBooksAtNow.value, onClick = {book -> vm.selectedBook(book)})
         if (isSelected != null) {
             ModalBottomSheet(
-                onDismissRequest = { vm.clearSelectedBook() }
+                onDismissRequest = { vm.clearSelectedBook() },
+                sheetState = sheetState,
+                modifier = Modifier
             ) {
-                Column(modifier = Modifier.fillMaxWidth().fillMaxHeight(0.4f)) {
-                    Text(text = "Hello")
-                }
+                BottomSheetUi(book = vm.selectedBook.value)
             }
         }
 
@@ -618,14 +627,20 @@ fun BookCover(url: String) {
 
     )
 }
-@Preview
+
 @Composable
-fun BottomSheetUi(){
-    Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
+fun BottomSheetUi(book: BookDetail?) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        // Header
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(15.dp),
+                .padding(bottom = 12.dp),
             horizontalAlignment = Alignment.Start,
         ) {
             Text(
@@ -634,135 +649,206 @@ fun BottomSheetUi(){
                 fontFamily = robotoExtraBold,
                 color = Color.Black
             )
-
             Text(
-                text = "Tracker your progress",
+                text = "Track your progress",
                 fontSize = 16.sp,
                 fontFamily = roboto,
                 color = slateGray,
             )
         }
 
+
         Surface(
             modifier = Modifier
-                .fillMaxWidth(0.95f)
-                .fillMaxHeight(0.3f)
-                .shadow(1.dp, shape = RoundedCornerShape(20.dp))
-                .clip(shape = RoundedCornerShape(20.dp))
-                .background(Color.White)
-            
+                .fillMaxWidth()
+                .shadow(2.dp, shape = RoundedCornerShape(20.dp)),
+            shape = RoundedCornerShape(20.dp),
+            color = Color.White
         ) {
-            Column(modifier = Modifier.fillMaxSize()) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    ){
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(start = 15.dp, top = 20.dp),
-                        horizontalArrangement = Arrangement.Start,
-
-                        ) {
-                        Image(
-                            painter = painterResource(R.drawable.img_test),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .size(height = 140.dp, width = 100.dp)
-                                .clip(shape = RoundedCornerShape(10.dp)),
-                            contentScale = ContentScale.Crop
+            Column(modifier = Modifier.padding(15.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Start,
+                ) {
+                    BookCover(book?.thumbnail ?: "")
+                    Column(
+                        modifier = Modifier.padding(horizontal = 10.dp)
+                    ) {
+                        Text(
+                            text = book?.bookTitle ?: "Unknown",
+                            fontSize = 20.sp,
+                            fontFamily = robotoExtraBold,
+                            color = Color.Black
                         )
-                        Column(
-                            modifier = Modifier.padding(horizontal = 10.dp)
+                        Spacer(Modifier.height(4.dp))
+                        Text(
+                            text = book?.bookAuthor ?: "Unknown",
+                            fontSize = 16.sp,
+                            fontFamily = roboto,
+                            color = slateGray,
+                        )
+                        Spacer(Modifier.height(16.dp))
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Text(
-                                text = "Five Survive",
-                                fontSize = 20.sp,
-                                fontFamily = robotoExtraBold,
-                                color = Color.Black
-                            )
-                            Spacer(modifier = Modifier.height(10.dp))
-
-                            Text(
-                                text = "Holly Jackson",
-                                fontSize = 16.sp,
-                                fontFamily = roboto,
-                                color = slateGray,
-                            )
-                            Spacer(modifier = Modifier.height(20.dp))
-                            Row(modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween) {
-                                Text(
-                                    text = "Reading Progress",
-                                    fontSize = 13.sp,
-                                    fontFamily = roboto,
-                                    color = slateGray,
-                                )
-                                Text(
-                                    text = "62%",
-                                    fontSize = 15.sp,
-                                    fontFamily = roboto,
-                                    color = lightGreen,
-                                )
-                            }
-                            Spacer(modifier = Modifier.height(8.dp))
+                            Text("Reading Progress", fontSize = 13.sp, fontFamily = roboto, color = slateGray)
+                            Text("62%", fontSize = 15.sp, fontFamily = roboto, color = lightGreen)
+                        }
+                        Spacer(Modifier.height(6.dp))
+                        // Progress bar
+                        Box(
+                            modifier = Modifier
+                                .height(8.dp)
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(40.dp))
+                                .background(Color.LightGray.copy(alpha = 0.35f))
+                        ) {
                             Box(
                                 modifier = Modifier
-                                    .height(8.dp)
-                                    .fillMaxWidth()
-                                    .clip(shape = RoundedCornerShape(40.dp))
-                                    .background(Color.LightGray.copy(alpha = 0.35f))
-                            ){
-                                Box(modifier = Modifier
                                     .fillMaxHeight()
-                                    .fillMaxWidth(0.45f)
-                                    .clip(shape = RoundedCornerShape(40.dp))
+                                    .fillMaxWidth(0.62f)  // ← відповідає 62%
+                                    .clip(RoundedCornerShape(40.dp))
                                     .background(lightGreen)
-                                )
-                            }
-                            Spacer(modifier = Modifier.height(10.dp))
-                            Row(modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween) {
-                                Text(
-                                    text = "Page 187",
-                                    fontSize = 13.sp,
-                                    fontFamily = roboto,
-                                    color = slateGray,
-                                )
-                                Text(
-                                    text = "Of 304",
-                                    fontSize = 13.sp,
-                                    fontFamily = roboto,
-                                    color = slateGray,
-                                )
-                            }
+                            )
+                        }
+                        Spacer(Modifier.height(8.dp))
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text("Page ${book?.readTitle}", fontSize = 13.sp, fontFamily = roboto, color = slateGray)
+                            Text("Of ${book?.totalTitles}", fontSize = 13.sp, fontFamily = roboto, color = slateGray)
                         }
                     }
-                    Row(
+                }
+
+                Spacer(Modifier.height(16.dp))
+                HorizontalDivider(color = Color.LightGray.copy(0.4f))
+                Spacer(Modifier.height(12.dp))
+
+                // Stats row
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                ) {
+                    StatItem("117", "Pages left")
+                    StatItem("3h 54m", "Time left")
+                    StatItem("2.0", "Min/page")
+                }
+                Spacer(Modifier.height(8.dp))
+            }
+        }
+
+        Spacer(Modifier.height(16.dp))
+
+        Text(
+            text = "Log Today's Pages",
+            fontSize = 20.sp,
+            fontFamily = robotoExtraBold,
+            color = Color.Black,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 12.dp)
+        )
+
+        // Page Logger Card — фіксована висота
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .shadow(2.dp, shape = RoundedCornerShape(20.dp)),
+            shape = RoundedCornerShape(20.dp),
+            color = Color.White
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 20.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Text(
+                    text = "Pages read today",
+                    color = Color.DarkGray,
+                    fontSize = 14.sp,
+                )
+                Spacer(Modifier.height(16.dp))
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 50.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Box(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 40.dp, vertical = 30.dp)
-                            .align(Alignment.BottomCenter),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                    ){
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(text = "117")
-                            Text(text = "Pages left")
-                        }
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(text = "3h 54m")
-                            Text(text = "Time left")
-                        }
-
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(text = "2.0")
-                            Text(text = "Min/page")
-                        }
-
+                            .clip(RoundedCornerShape(20.dp))
+                            .background(Color.LightGray.copy(0.2f))
+                            .size(40.dp),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_minus),
+                            contentDescription = null,
+                            modifier = Modifier.size(10.dp),
+                            tint = Color.Gray
+                        )
+                    }
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(text = "0", fontSize = 15.sp, fontFamily = robotoExtraBold)
+                        Text(text = "pages", color = slateGray)
+                    }
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(20.dp))
+                            .background(lightGreen)
+                            .size(44.dp),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_add),
+                            contentDescription = null,
+                            modifier = Modifier.size(14.dp),
+                            tint = Color.White
+                        )
                     }
                 }
             }
-
         }
+
+        Spacer(Modifier.height(24.dp))
+
+
+        Button(
+            onClick = {},
+            shape = RoundedCornerShape(20.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(55.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = lightGreen),
+        ) {
+            Text(text = "Save Progress", fontSize = 15.sp, fontFamily = robotoSemiBold)
+        }
+        Spacer(Modifier.height(8.dp))
+        OutlinedButton(
+            onClick = {},
+            shape = RoundedCornerShape(20.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(55.dp),
+            border = BorderStroke(1.dp, Color.DarkGray),
+            colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.DarkGray, containerColor = Color.White)
+        ) {
+            Text(text = "Mark as Finished", fontSize = 15.sp, fontFamily = robotoSemiBold)
+        }
+        Spacer(Modifier.height(16.dp))
+    }
+}
+
+@Composable
+private fun StatItem(value: String, label: String) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(text = value, fontSize = 16.sp, color = Color.Black, fontFamily = robotoExtraBold)
+        Text(text = label, fontSize = 12.sp, color = slateGray)
     }
 }
 
