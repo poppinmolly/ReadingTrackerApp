@@ -174,7 +174,13 @@ fun HomeTabScreen(
                 sheetState = sheetState,
                 modifier = Modifier
             ) {
-                BottomSheetUi(book = vm.selectedBook.value)
+                BottomSheetUi(
+                    book = vm.selectedBook.value,
+                    onAddValue = vm::addValue,
+                    onSubtractValue = vm::subtractValue,
+                    readingValue = vm.readTitlesValue.value,
+                    onSaveProgress = vm::saveProgressReadingTitles
+                )
             }
         }
 
@@ -606,8 +612,9 @@ fun ReadingBookCard(book: BookDetail, onClick: () -> Unit){
 }
 
 
-fun calculatePercent(atNow: Int, total: Int):String{
-    return ((atNow/total) * 100).toString() + "%"
+fun calculatePercent(atNow: Int, total: Int): String {
+    if (total == 0) return "0%"
+    return ((atNow.toFloat() / total.toFloat()) * 100).toInt().toString() + "%"
 }
 
 fun calculateProgress(current: Int, total: Int): Float {
@@ -629,7 +636,9 @@ fun BookCover(url: String) {
 }
 
 @Composable
-fun BottomSheetUi(book: BookDetail?) {
+fun BottomSheetUi(book: BookDetail?, onAddValue:() -> Unit, onSubtractValue:() -> Unit, readingValue: Int, onSaveProgress:() -> Unit) {
+    val progress = calculateProgress(book?.readTitle ?: 0, book?.totalTitles ?: 0)
+    val percent = calculatePercent(book?.readTitle ?: 0, book?.totalTitles ?: 0)
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -693,7 +702,7 @@ fun BottomSheetUi(book: BookDetail?) {
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Text("Reading Progress", fontSize = 13.sp, fontFamily = roboto, color = slateGray)
-                            Text("62%", fontSize = 15.sp, fontFamily = roboto, color = lightGreen)
+                            Text(percent, fontSize = 15.sp, fontFamily = roboto, color = lightGreen)
                         }
                         Spacer(Modifier.height(6.dp))
                         // Progress bar
@@ -707,7 +716,7 @@ fun BottomSheetUi(book: BookDetail?) {
                             Box(
                                 modifier = Modifier
                                     .fillMaxHeight()
-                                    .fillMaxWidth(0.62f)  // ← відповідає 62%
+                                    .fillMaxWidth(progress)
                                     .clip(RoundedCornerShape(40.dp))
                                     .background(lightGreen)
                             )
@@ -732,8 +741,8 @@ fun BottomSheetUi(book: BookDetail?) {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly,
                 ) {
-                    StatItem("117", "Pages left")
-                    StatItem("3h 54m", "Time left")
+                    StatItem(book?.readTitle.toString(), "Pages left")
+                    StatItem(calculateTimeReading(book?.readTitle ?: 0), "Time left")
                     StatItem("2.0", "Min/page")
                 }
                 Spacer(Modifier.height(8.dp))
@@ -752,7 +761,7 @@ fun BottomSheetUi(book: BookDetail?) {
                 .padding(bottom = 12.dp)
         )
 
-        // Page Logger Card — фіксована висота
+
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
@@ -783,7 +792,8 @@ fun BottomSheetUi(book: BookDetail?) {
                         modifier = Modifier
                             .clip(RoundedCornerShape(20.dp))
                             .background(Color.LightGray.copy(0.2f))
-                            .size(40.dp),
+                            .size(40.dp)
+                            .clickable(onClick = onSubtractValue),
                         contentAlignment = Alignment.Center,
                     ) {
                         Icon(
@@ -794,14 +804,15 @@ fun BottomSheetUi(book: BookDetail?) {
                         )
                     }
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(text = "0", fontSize = 15.sp, fontFamily = robotoExtraBold)
+                        Text(text = readingValue.toString(), fontSize = 15.sp, fontFamily = robotoExtraBold)
                         Text(text = "pages", color = slateGray)
                     }
                     Box(
                         modifier = Modifier
                             .clip(RoundedCornerShape(20.dp))
                             .background(lightGreen)
-                            .size(44.dp),
+                            .size(44.dp)
+                            .clickable(onClick = onAddValue),
                         contentAlignment = Alignment.Center,
                     ) {
                         Icon(
@@ -819,7 +830,7 @@ fun BottomSheetUi(book: BookDetail?) {
 
 
         Button(
-            onClick = {},
+            onClick = onSaveProgress,
             shape = RoundedCornerShape(20.dp),
             modifier = Modifier
                 .fillMaxWidth()
@@ -850,5 +861,11 @@ private fun StatItem(value: String, label: String) {
         Text(text = value, fontSize = 16.sp, color = Color.Black, fontFamily = robotoExtraBold)
         Text(text = label, fontSize = 12.sp, color = slateGray)
     }
+}
+private fun calculateTimeReading(readingPages: Int): String {
+    val minutes = readingPages * 2
+    val h = minutes / 60
+    val m = minutes % 60
+    return "${h}h ${m}m"
 }
 

@@ -9,4 +9,6 @@ interface BookRepository{
     suspend fun addBook(book: Book)
 
     suspend fun getAllAddedBooks(): List<BookDetail>
+
+    suspend fun changeReadTitles(book: BookDetail, titles: Int)
 }

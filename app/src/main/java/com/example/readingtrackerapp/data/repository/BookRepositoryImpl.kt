@@ -29,5 +29,9 @@ class BookRepositoryImpl @Inject constructor(
 
     }
 
+    override suspend fun changeReadTitles(book: BookDetail, titles: Int ) {
+        bookDao.addReadTitles(bookId = book.id, titles = titles )
+    }
+
 
 }
