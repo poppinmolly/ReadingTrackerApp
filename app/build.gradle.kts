@@ -86,4 +86,7 @@ dependencies {
 
     // Retrofit
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
+
+    // The compose calendar library for Android
+    implementation("com.fleeys:heatmap:1.0.5")
 }
