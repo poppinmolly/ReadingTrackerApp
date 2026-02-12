@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
@@ -48,7 +49,6 @@ import com.example.readingtrackerapp.ui.theme.slateGray
 import com.example.readingtrackerapp.ui.theme.someLightBlue
 import com.example.readingtrackerapp.ui.theme.someLightPurple
 
-@Preview
 @Composable
 fun ReadingScreen(){
     val pagesReadModel = ItemsModel(
@@ -75,185 +75,199 @@ fun ReadingScreen(){
         statDescription = "Hours this week"
     )
 
-
-
-
-    Column(modifier = Modifier
-        .fillMaxSize(),
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 15.dp, vertical = 10.dp),
-            horizontalAlignment = Alignment.Start,
-        ) {
-            Text(text = "Your stats",
-                fontSize = 25.sp,
-                fontFamily = robotoSemiBold,
 
-            )
-            Spacer(modifier = Modifier.height(5.dp))
-            Text(
-                text = "Track your reading journey",
-                fontSize = 17.sp,
-                fontFamily = roboto,
-                color = slateGray,)
-        }
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 10.dp, vertical = 10.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            val greenGradient = Brush.horizontalGradient(cardGradientGreen)
-            val blueGradient = Brush.horizontalGradient(cardGradientBlue)
-
-            // GREEN CARD
-            Box(modifier = Modifier
-                .weight(1f)
-                .height(160.dp)
-                .clip(shape = RoundedCornerShape(20.dp))
-                .background(greenGradient)){
-
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Surface(
-                        modifier = Modifier
-                            .padding(horizontal = 20.dp, vertical = 14.dp)
-                            .clip(RoundedCornerShape(13.dp)),
-                        color = Color.White.copy(alpha = 0.2f)
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(10.dp), // внутрішній padding
-                            verticalArrangement = Arrangement.spacedBy(6.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Box(
-                                modifier = Modifier.size(28.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    painter = painterResource(R.drawable.ic_fire),
-                                    contentDescription = null,
-                                    tint = Color.White,
-                                    modifier = Modifier.size(18.dp)
-                                )
-                            }
-
-                        }
-                    }
-
-                    Text(text = "12",
-                        color = Color.White,
-                        fontSize = 30.sp,
-                        fontFamily = robotoExtraBold,
-                    )
-                    Text(text = "Day streak",
-                        color = fontGrayColor,
-                        fontSize = 15.sp,
-                        fontFamily = roboto,
-                        modifier = Modifier.offset(x = 5.dp)
-                    )
-                }
-
-            }
-            Spacer(modifier = Modifier.width(20.dp))
-            // BLUE CARD
-            Box(modifier = Modifier
-                .weight(1f)
-                .height(160.dp)
-                .clip(shape = RoundedCornerShape(20.dp))
-                .background(blueGradient)){
-
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Surface(
-                        modifier = Modifier
-                            .padding(horizontal = 20.dp, vertical = 14.dp)
-                            .clip(RoundedCornerShape(13.dp)),
-                        color = Color.White.copy(alpha = 0.2f)
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(10.dp),
-                            verticalArrangement = Arrangement.spacedBy(6.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Box(
-                                modifier = Modifier.size(28.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    painter = painterResource(R.drawable.ic_books),
-                                    contentDescription = null,
-                                    tint = Color.White,
-                                    modifier = Modifier.size(18.dp)
-                                )
-                            }
-
-                        }
-                    }
-
-                    Text(text = "8",
-                        color = Color.White,
-                        fontSize = 30.sp,
-                        fontFamily = robotoExtraBold,
-                    )
-                    Text(text = "Books done",
-                        color = fontGrayColor,
-                        fontSize = 15.sp,
-                        fontFamily = roboto,
-                        modifier = Modifier.offset(x = 5.dp)
-                        
-                    )
-                }
-
-            }
-        }
-        Spacer(modifier = Modifier.height(15.dp))
-        Text(text = "This Week",
-            fontSize = 23.sp,
-            fontFamily = robotoSemiBold,
-            modifier = Modifier
-                .align(Alignment.Start)
-                .padding(horizontal = 15.dp)
-            )
-        Spacer(modifier = Modifier.height(10.dp))
-        Box(modifier = Modifier
-            .fillMaxWidth(0.95f)
-            .height(210.dp)
-            ){
-            Surface(
+        // Заголовок
+        item {
+            Column(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .border(1.dp, Color.DarkGray.copy(0.1f), RoundedCornerShape(20.dp))
-                    .clip(shape = RoundedCornerShape(20.dp))
-            ){
-                Column(modifier = Modifier.fillMaxSize()) {
-                    StatItem(item = pagesReadModel)
-                    HorizontalDividerUi()
-                    StatItem(item = dailyAverageModel)
-                    HorizontalDividerUi()
-                    StatItem(item = readingTimeModel)
-                }
-
+                    .fillMaxWidth()
+                    .padding(horizontal = 15.dp, vertical = 10.dp),
+                horizontalAlignment = Alignment.Start,
+            ) {
+                Text(
+                    text = "Your stats",
+                    fontSize = 25.sp,
+                    fontFamily = robotoSemiBold,
+                )
+                Spacer(modifier = Modifier.height(5.dp))
+                Text(
+                    text = "Track your reading journey",
+                    fontSize = 17.sp,
+                    fontFamily = roboto,
+                    color = slateGray,
+                )
             }
         }
-        Spacer(modifier = Modifier.height(20.dp))
-        Text(text = "All Time",
-            fontSize = 23.sp,
-            fontFamily = robotoSemiBold,
-            modifier = Modifier
-                .align(Alignment.Start)
-                .padding(horizontal = 15.dp)
-        )
-        Spacer(modifier = Modifier.height(10.dp))
-        TotalStat()
+
+        // Картки Green/Blue
+        item {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 10.dp, vertical = 10.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                val greenGradient = Brush.horizontalGradient(cardGradientGreen)
+                val blueGradient = Brush.horizontalGradient(cardGradientBlue)
+
+                // GREEN CARD
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(160.dp)
+                        .clip(shape = RoundedCornerShape(20.dp))
+                        .background(greenGradient)
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Surface(
+                            modifier = Modifier
+                                .padding(horizontal = 20.dp, vertical = 14.dp)
+                                .clip(RoundedCornerShape(13.dp)),
+                            color = Color.White.copy(alpha = 0.2f)
+                        ) {
+                            Column(
+                                modifier = Modifier.padding(10.dp),
+                                verticalArrangement = Arrangement.spacedBy(6.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Box(
+                                    modifier = Modifier.size(28.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.ic_fire),
+                                        contentDescription = null,
+                                        tint = Color.White,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                }
+                            }
+                        }
+                        Text(
+                            text = "12",
+                            color = Color.White,
+                            fontSize = 30.sp,
+                            fontFamily = robotoExtraBold,
+                        )
+                        Text(
+                            text = "Day streak",
+                            color = fontGrayColor,
+                            fontSize = 15.sp,
+                            fontFamily = roboto,
+                            modifier = Modifier.offset(x = 5.dp)
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.width(20.dp))
+
+                // BLUE CARD
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(160.dp)
+                        .clip(shape = RoundedCornerShape(20.dp))
+                        .background(blueGradient)
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Surface(
+                            modifier = Modifier
+                                .padding(horizontal = 20.dp, vertical = 14.dp)
+                                .clip(RoundedCornerShape(13.dp)),
+                            color = Color.White.copy(alpha = 0.2f)
+                        ) {
+                            Column(
+                                modifier = Modifier.padding(10.dp),
+                                verticalArrangement = Arrangement.spacedBy(6.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Box(
+                                    modifier = Modifier.size(28.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.ic_books),
+                                        contentDescription = null,
+                                        tint = Color.White,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                }
+                            }
+                        }
+                        Text(
+                            text = "8",
+                            color = Color.White,
+                            fontSize = 30.sp,
+                            fontFamily = robotoExtraBold,
+                        )
+                        Text(
+                            text = "Books done",
+                            color = fontGrayColor,
+                            fontSize = 15.sp,
+                            fontFamily = roboto,
+                            modifier = Modifier.offset(x = 5.dp)
+                        )
+                    }
+                }
+            }
+        }
+
+        // This Week
+        item {
+            Spacer(modifier = Modifier.height(15.dp))
+            Text(
+                text = "This Week",
+                fontSize = 23.sp,
+                fontFamily = robotoSemiBold,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 15.dp)
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(0.95f)
+                    .height(210.dp)
+            ) {
+                Surface(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .border(1.dp, Color.DarkGray.copy(0.1f), RoundedCornerShape(20.dp))
+                        .clip(shape = RoundedCornerShape(20.dp))
+                ) {
+                    Column(modifier = Modifier.fillMaxSize()) {
+                        StatItem(item = pagesReadModel)
+                        HorizontalDividerUi()
+                        StatItem(item = dailyAverageModel)
+                        HorizontalDividerUi()
+                        StatItem(item = readingTimeModel)
+                    }
+                }
+            }
+        }
+
+        // All Time
+        item {
+            Spacer(modifier = Modifier.height(20.dp))
+            Text(
+                text = "All Time",
+                fontSize = 23.sp,
+                fontFamily = robotoSemiBold,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 15.dp)
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+            TotalStat()
+            Spacer(modifier = Modifier.height(20.dp))
+        }
     }
 }
+
 
 @Composable
 fun StatItem(item: ItemsModel){
@@ -322,7 +336,7 @@ fun VerticalDividerUi(){
         color = Color.LightGray.copy(0.2f)
     )
 }
-@Preview
+
 @Composable
 fun TotalStat(){
     Box(
