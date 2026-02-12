@@ -32,5 +32,4 @@ val mintBg = Color(0xFFF0FDF4)
 val errorRedColor = Color(0xFFFDAFAF)
 val someLightBlue = Color(0xFF1A73E8)
 val someLightPurple = Color(0xFFA259FF)
-
-
+val darkBlue = Color(0xFF0B1624)

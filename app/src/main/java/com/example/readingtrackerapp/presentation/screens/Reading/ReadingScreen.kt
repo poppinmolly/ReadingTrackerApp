@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -20,6 +21,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,10 +36,13 @@ import com.example.readingtrackerapp.R
 import com.example.readingtrackerapp.ui.model.ItemsModel
 import com.example.readingtrackerapp.ui.theme.cardGradientBlue
 import com.example.readingtrackerapp.ui.theme.cardGradientGreen
+import com.example.readingtrackerapp.ui.theme.darkBlue
 import com.example.readingtrackerapp.ui.theme.fontGrayColor
+import com.example.readingtrackerapp.ui.theme.lightGray
 import com.example.readingtrackerapp.ui.theme.lightGreen
 import com.example.readingtrackerapp.ui.theme.roboto
 import com.example.readingtrackerapp.ui.theme.robotoExtraBold
+import com.example.readingtrackerapp.ui.theme.robotoMedium
 import com.example.readingtrackerapp.ui.theme.robotoSemiBold
 import com.example.readingtrackerapp.ui.theme.slateGray
 import com.example.readingtrackerapp.ui.theme.someLightBlue
@@ -237,7 +242,16 @@ fun ReadingScreen(){
 
             }
         }
-
+        Spacer(modifier = Modifier.height(20.dp))
+        Text(text = "All Time",
+            fontSize = 23.sp,
+            fontFamily = robotoSemiBold,
+            modifier = Modifier
+                .align(Alignment.Start)
+                .padding(horizontal = 15.dp)
+        )
+        Spacer(modifier = Modifier.height(10.dp))
+        TotalStat()
     }
 }
 
@@ -289,7 +303,7 @@ fun StatItem(item: ItemsModel){
         ){
             Text(
                 text = "487",
-                fontSize = 22.sp,
+                fontSize = 17.sp,
                 fontFamily = robotoExtraBold,
             )
         }
@@ -299,4 +313,78 @@ fun StatItem(item: ItemsModel){
 @Composable
 fun HorizontalDividerUi(){
     HorizontalDivider(modifier = Modifier.fillMaxWidth(), color = Color.DarkGray.copy(0.1f))
+}
+@Composable
+fun VerticalDividerUi(){
+    VerticalDivider(
+        modifier = Modifier
+            .fillMaxHeight(0.5f),
+        color = Color.LightGray.copy(0.2f)
+    )
+}
+@Preview
+@Composable
+fun TotalStat(){
+    Box(
+        modifier = Modifier
+            .clip(shape = RoundedCornerShape(20.dp))
+            .fillMaxWidth(0.95f)
+            .background(darkBlue)
+            .height(100.dp)
+    ){
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 15.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            // FIRST BLOCK
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = "3 247",
+                    color = Color.White,
+                    fontFamily = robotoExtraBold,
+                    fontSize = 25.sp,
+                    )
+                Text(text = "Total Pages",
+                    color = fontGrayColor,
+                    fontFamily = robotoMedium,
+                    fontSize = 12.sp)
+            }
+            VerticalDividerUi()
+
+            // SECOND BLOCK
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = "8",
+                    color = Color.White,
+                    fontFamily = robotoExtraBold,
+                    fontSize = 25.sp,
+                )
+                Text(text = "Books",
+                    color = fontGrayColor,
+                    fontFamily = robotoMedium,
+                    fontSize = 12.sp)
+            }
+            VerticalDividerUi()
+
+            // THIRD BLOCK
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ){
+                Text(
+                    text = "12",
+                    color = Color.White,
+                    fontFamily = robotoExtraBold,
+                    fontSize = 25.sp,
+                )
+                Text(text = "Best Streak",
+                    color = fontGrayColor,
+                    fontFamily = robotoMedium,
+                    fontSize = 12.sp)
+            }
+        }
+
+    }
 }
