@@ -24,6 +24,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -33,6 +35,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.ViewModel
 import com.example.readingtrackerapp.R
 import com.example.readingtrackerapp.ui.model.ItemsModel
 import com.example.readingtrackerapp.ui.theme.cardGradientBlue
@@ -50,7 +54,10 @@ import com.example.readingtrackerapp.ui.theme.someLightBlue
 import com.example.readingtrackerapp.ui.theme.someLightPurple
 
 @Composable
-fun ReadingScreen(){
+fun ReadingScreen(
+    vm: ReadingScreenViewModel = hiltViewModel()
+){
+    val totalReadPages by vm.totalReadPages.collectAsState()
     val pagesReadModel = ItemsModel(
         iconId = R.drawable.ic_books,
         backgroundIcoColor = lightGreen,
@@ -262,7 +269,7 @@ fun ReadingScreen(){
                     .padding(horizontal = 15.dp)
             )
             Spacer(modifier = Modifier.height(10.dp))
-            TotalStat()
+            TotalStat(totalReadPages = totalReadPages)
             Spacer(modifier = Modifier.height(20.dp))
         }
     }
@@ -338,7 +345,9 @@ fun VerticalDividerUi(){
 }
 
 @Composable
-fun TotalStat(){
+fun TotalStat(
+    totalReadPages: Int
+){
     Box(
         modifier = Modifier
             .clip(shape = RoundedCornerShape(20.dp))
@@ -356,7 +365,7 @@ fun TotalStat(){
             // FIRST BLOCK
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    text = "3 247",
+                    text = totalReadPages.toString(),
                     color = Color.White,
                     fontFamily = robotoExtraBold,
                     fontSize = 25.sp,

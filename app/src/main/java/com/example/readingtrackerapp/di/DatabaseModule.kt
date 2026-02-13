@@ -3,6 +3,7 @@ package com.example.readingtrackerapp.di
 import android.content.Context
 import androidx.room.Room
 import com.example.readingtrackerapp.data.local.dao.BookDao
+import com.example.readingtrackerapp.data.local.dao.StatsDao
 import com.example.readingtrackerapp.data.local.database.BookDatabase
 import dagger.Module
 import dagger.Provides
@@ -31,4 +32,9 @@ object DatabaseModule {
     @Singleton
     fun providesDao(db: BookDatabase): BookDao =
         db.bookDao()
+
+    @Provides
+    @Singleton
+    fun providesStatDao(db: BookDatabase): StatsDao =
+        db.statsDao()
 }

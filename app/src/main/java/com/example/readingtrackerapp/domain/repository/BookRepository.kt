@@ -2,6 +2,7 @@ package com.example.readingtrackerapp.domain.repository
 
 import com.example.readingtrackerapp.data.local.entity.BookDetail
 import com.example.readingtrackerapp.domain.model.Book
+import kotlinx.coroutines.flow.Flow
 
 interface BookRepository{
     suspend fun getBook(title: String): List<Book>
@@ -11,4 +12,6 @@ interface BookRepository{
     suspend fun getAllAddedBooks(): List<BookDetail>
 
     suspend fun changeReadTitles(book: BookDetail, titles: Int)
+
+    fun getAllReadTitles(): Flow<Int?>
 }
