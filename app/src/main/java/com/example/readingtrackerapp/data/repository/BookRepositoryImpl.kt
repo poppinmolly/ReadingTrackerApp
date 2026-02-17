@@ -1,5 +1,6 @@
 package com.example.readingtrackerapp.data.repository
 
+import android.util.Log
 import com.example.readingtrackerapp.data.datasource.BooksRemoteDataSource
 import com.example.readingtrackerapp.data.local.dao.BookDao
 import com.example.readingtrackerapp.data.local.dao.StatsDao
@@ -9,8 +10,10 @@ import com.example.readingtrackerapp.data.local.entity.DailySession
 import com.example.readingtrackerapp.data.mapper.toDomain
 import com.example.readingtrackerapp.data.mapper.toEntity
 import com.example.readingtrackerapp.domain.model.Book
+import com.example.readingtrackerapp.domain.model.WeeklyStatsModel
 import com.example.readingtrackerapp.domain.repository.BookRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 
@@ -42,11 +45,36 @@ class BookRepositoryImpl @Inject constructor(
                 bookId = book.id,
                 id = 0,
             )
+
         )
+        Log.d("VASYAN", "titles is $titles")
     }
 
     override fun getAllReadTitles(): Flow<Int?> {
         return statsDao.getTotalPagesRead()
+    }
+
+    fun calculateReadingTime(total: Int): String {
+        val totalMinutes = total * 2
+        val h = totalMinutes / 60
+        val m = totalMinutes % 60
+        return "$h h $m minutes"
+    }
+
+    override fun getStatForLastWeek(lastSevenDays: Long): Flow<WeeklyStatsModel> = flow {
+        val weeklyDays = statsDao.getLastWeekStats(lastSevenDays)
+        val days = System.currentTimeMillis() - weeklyDays[0].date
+        val streakDays = if (days.toInt() / 86400000 == 0) 1 else days / 86400000
+        val total = weeklyDays.sumOf { it.readPages }
+        Log.d("TOTAL", "TOTAL IS $total")
+        val average = if (weeklyDays.isNotEmpty() && streakDays.toInt() == 7) total / 7 else total / streakDays.toInt()
+        Log.d("TOTAL", "AVERAGE IS $average")
+        val readingTime = calculateReadingTime(total)
+        emit(WeeklyStatsModel(
+            pagesRead = total,
+            dailyAverage = average,
+            readingTime = readingTime
+        ))
     }
 
 

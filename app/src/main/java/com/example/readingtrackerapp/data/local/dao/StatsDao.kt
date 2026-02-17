@@ -12,4 +12,9 @@ interface StatsDao {
 
     @Query("SELECT SUM(readPages) FROM sessions_db")
     fun getTotalPagesRead(): Flow<Int?>
+
+    @Query("""
+        SELECT * FROM sessions_db WHERE date >= :sevenDaysAgo
+    """)
+    suspend fun getLastWeekStats(sevenDaysAgo: Long): List<DailySession>
 }

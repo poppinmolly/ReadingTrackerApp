@@ -1,5 +1,6 @@
 package com.example.readingtrackerapp.presentation.screens.Reading
 
+import android.R.attr.value
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -56,22 +57,34 @@ import com.example.readingtrackerapp.ui.theme.someLightPurple
 @Composable
 fun ReadingScreen(
     vm: ReadingScreenViewModel = hiltViewModel()
+
 ){
-    val totalReadPages by vm.totalReadPages.collectAsState()
+    val totalReadPages = vm.totalReadPages.collectAsState().value
+
+
+    val dailyStats = vm.lastWeekStats.collectAsState()
+    val weeklyPagesRead = dailyStats.value?.pagesRead
+    val dailyAveragePagesReading = dailyStats.value?.dailyAverage
+    val weeklyTimeReading = dailyStats.value?.readingTime
+
+
     val pagesReadModel = ItemsModel(
         iconId = R.drawable.ic_books,
         backgroundIcoColor = lightGreen,
         icoColor = lightGreen,
         statText = "Pages Read",
-        statDescription = "Total this week"
+        statDescription = "Total this week",
+        value = weeklyPagesRead.toString() ,
     )
+
 
     val dailyAverageModel = ItemsModel(
         iconId = R.drawable.ic_average,
         backgroundIcoColor = someLightBlue,
         icoColor = someLightBlue,
         statText = "Daily Average",
-        statDescription = "Pages per day"
+        statDescription = "Pages per day",
+        value = dailyAveragePagesReading.toString()  ,
     )
 
     val readingTimeModel = ItemsModel(
@@ -79,8 +92,11 @@ fun ReadingScreen(
         backgroundIcoColor = someLightPurple,
         icoColor = someLightPurple,
         statText = "Reading Time",
-        statDescription = "Hours this week"
+        statDescription = "Hours this week",
+        value = weeklyTimeReading.toString(),
     )
+
+
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -323,7 +339,7 @@ fun StatItem(item: ItemsModel){
             contentAlignment = Alignment.CenterEnd
         ){
             Text(
-                text = "487",
+                text = item.value,
                 fontSize = 17.sp,
                 fontFamily = robotoExtraBold,
             )

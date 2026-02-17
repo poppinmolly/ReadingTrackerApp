@@ -9,4 +9,5 @@ data class ItemsModel(
     val icoColor: Color,
     val statText: String,
     val statDescription: String,
+    val value: String
 )
