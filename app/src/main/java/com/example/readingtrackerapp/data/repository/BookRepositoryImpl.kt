@@ -47,7 +47,7 @@ class BookRepositoryImpl @Inject constructor(
             )
 
         )
-        Log.d("VASYAN", "titles is $titles")
+        
     }
 
     override fun getAllReadTitles(): Flow<Int?> {
