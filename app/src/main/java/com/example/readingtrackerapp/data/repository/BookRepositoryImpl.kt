@@ -1,6 +1,5 @@
 package com.example.readingtrackerapp.data.repository
 
-import android.util.Log
 import com.example.readingtrackerapp.data.datasource.BooksRemoteDataSource
 import com.example.readingtrackerapp.data.local.dao.BookDao
 import com.example.readingtrackerapp.data.local.dao.StatsDao
@@ -10,9 +9,11 @@ import com.example.readingtrackerapp.data.local.entity.DailySession
 import com.example.readingtrackerapp.data.mapper.toDomain
 import com.example.readingtrackerapp.data.mapper.toEntity
 import com.example.readingtrackerapp.domain.model.Book
+import com.example.readingtrackerapp.domain.model.TotalStatsModel
 import com.example.readingtrackerapp.domain.model.WeeklyStatsModel
 import com.example.readingtrackerapp.domain.repository.BookRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
@@ -44,14 +45,22 @@ class BookRepositoryImpl @Inject constructor(
                 readPages = titles,
                 bookId = book.id,
                 id = 0,
+
             )
 
         )
-        
-    }
 
-    override fun getAllReadTitles(): Flow<Int?> {
-        return statsDao.getTotalPagesRead()
+    }
+    override fun getAllTimeStats(): Flow<TotalStatsModel> = flow {
+        val totalStat = statsDao.getAllTimeStats()
+
+        emit(
+            TotalStatsModel(
+                totalReadingBooks = totalStat.sumOf { it.booksRead },
+                totalPagesRead = totalStat.sumOf { it.readPages },
+                totalBestStreak = totalStat.sumOf { it.id.toInt() }
+            )
+        )
     }
 
     fun calculateReadingTime(total: Int): String {
@@ -66,9 +75,9 @@ class BookRepositoryImpl @Inject constructor(
         val days = System.currentTimeMillis() - weeklyDays[0].date
         val streakDays = if (days.toInt() / 86400000 == 0) 1 else days / 86400000
         val total = weeklyDays.sumOf { it.readPages }
-        Log.d("TOTAL", "TOTAL IS $total")
+
         val average = if (weeklyDays.isNotEmpty() && streakDays.toInt() == 7) total / 7 else total / streakDays.toInt()
-        Log.d("TOTAL", "AVERAGE IS $average")
+
         val readingTime = calculateReadingTime(total)
         emit(WeeklyStatsModel(
             pagesRead = total,

@@ -59,7 +59,7 @@ fun ReadingScreen(
     vm: ReadingScreenViewModel = hiltViewModel()
 
 ){
-    val totalReadPages = vm.totalReadPages.collectAsState().value
+    val totalStats = vm.totalReadStats.collectAsState().value
 
 
     val dailyStats = vm.lastWeekStats.collectAsState()
@@ -171,7 +171,7 @@ fun ReadingScreen(
                             }
                         }
                         Text(
-                            text = "12",
+                            text = totalStats.totalBestStreak.toString(),
                             color = Color.White,
                             fontSize = 30.sp,
                             fontFamily = robotoExtraBold,
@@ -222,7 +222,7 @@ fun ReadingScreen(
                             }
                         }
                         Text(
-                            text = "8",
+                            text = totalStats.totalReadingBooks.toString(),
                             color = Color.White,
                             fontSize = 30.sp,
                             fontFamily = robotoExtraBold,
@@ -285,7 +285,11 @@ fun ReadingScreen(
                     .padding(horizontal = 15.dp)
             )
             Spacer(modifier = Modifier.height(10.dp))
-            TotalStat(totalReadPages = totalReadPages)
+            TotalStat(
+                totalReadPages = totalStats.totalPagesRead,
+                totalBookRead = totalStats.totalReadingBooks,
+                totalBestStreak = totalStats.totalBestStreak
+            )
             Spacer(modifier = Modifier.height(20.dp))
         }
     }
@@ -362,7 +366,9 @@ fun VerticalDividerUi(){
 
 @Composable
 fun TotalStat(
-    totalReadPages: Int
+    totalReadPages: Int,
+    totalBookRead: Int,
+    totalBestStreak: Int,
 ){
     Box(
         modifier = Modifier
@@ -396,7 +402,7 @@ fun TotalStat(
             // SECOND BLOCK
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    text = "8",
+                    text = totalBookRead.toString(),
                     color = Color.White,
                     fontFamily = robotoExtraBold,
                     fontSize = 25.sp,
@@ -413,7 +419,7 @@ fun TotalStat(
                 horizontalAlignment = Alignment.CenterHorizontally
             ){
                 Text(
-                    text = "12",
+                    text = totalBestStreak.toString(),
                     color = Color.White,
                     fontFamily = robotoExtraBold,
                     fontSize = 25.sp,

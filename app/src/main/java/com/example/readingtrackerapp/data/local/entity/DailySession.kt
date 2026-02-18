@@ -7,7 +7,8 @@ import androidx.room.PrimaryKey
 data class DailySession(
     @PrimaryKey(autoGenerate = true)
     val id: Long,
-    val readPages: Int,
-    val bookId: Long,
+    val readPages: Int = 0,
+    val bookId: Long = 0,
+    val booksRead: Int = 0,
     val date: Long = System.currentTimeMillis()
 )
