@@ -89,4 +89,9 @@ dependencies {
 
     // The compose calendar library for Android
     implementation("com.fleeys:heatmap:1.0.5")
+
+    //Material3
+    implementation("androidx.compose.material3:material3:1.2.0")
+
+
 }

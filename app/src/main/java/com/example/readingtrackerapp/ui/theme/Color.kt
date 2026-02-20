@@ -25,7 +25,7 @@ val cardGradientBlue = listOf(
     Color(0xFF1E5DFF)
 )
 val fontGrayColor = Color(0xFFEAEFEF)
-val backgroundButton = Color(0x4DE5E7EB)
+val backgroundButton = Color(0xFFFAFAFA)
 val lightGreen = Color(0xFF22C55E)
 val colorBackgroundDefault = Color(0xFFFAF8FF)
 val mintBg = Color(0xFFF0FDF4)
