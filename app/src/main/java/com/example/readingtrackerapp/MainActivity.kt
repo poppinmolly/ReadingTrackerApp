@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import com.example.readingtrackerapp.presentation.screens.Home.HomeScreen
 import com.example.readingtrackerapp.presentation.screens.Home.HomeScreenUi
+import com.example.readingtrackerapp.presentation.screens.Onboarding.OnboardingScreen
 import com.example.readingtrackerapp.ui.theme.ReadingTrackerAppTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -16,7 +17,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             ReadingTrackerAppTheme {
-                HomeScreen()
+                OnboardingScreen()
             }
         }
     }

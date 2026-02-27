@@ -1,5 +1,8 @@
 package com.example.readingtrackerapp.presentation.screens.Onboarding
 
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,27 +15,34 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.readingtrackerapp.R
 import com.example.readingtrackerapp.ui.theme.colorBackgroundDefault
+import com.example.readingtrackerapp.ui.theme.lightGray
+import com.example.readingtrackerapp.ui.theme.lightGreen
 import com.example.readingtrackerapp.ui.theme.roboto
 import com.example.readingtrackerapp.ui.theme.robotoExtraBold
 import com.example.readingtrackerapp.ui.theme.robotoMedium
@@ -55,10 +65,12 @@ fun OnboardingScreen(
         OnboardingPageContent(
             page = page,
             onNameChange = vm::onNameChange,
-            onPagesChange = vm::onPagesChange,
             nameValue = vm.nameValue,
-            pagesValue = vm.pagesValue
-        )
+            onPagesChange = vm::onPagesChange,
+            pagesValue = vm.pagesValue,
+            pagerState = pagerState,
+            pagesSelected = vm.pagesSelected
+            )
     }
 }
 
@@ -69,15 +81,28 @@ fun OnboardingPageContent(
     nameValue: String,
     onPagesChange: (String) -> Unit,
     pagesValue: String,
+    pagerState: PagerState,
+    pagesSelected: String,
 
 
 
 
-){
+    ){
+    val buttonColor = if (nameValue != "") lightGreen else lightGray
+    val textColor = if (nameValue != "") Color.White else Color.Gray
+
+    val buttonPagesColor = if (pagesValue != "") lightGreen else lightGray
+    val textButtonColor = if (pagesValue != "") Color.White else Color.Gray
+
+
+
     Column(modifier = Modifier
         .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally) {
-        Spacer(modifier = Modifier.fillMaxHeight(0.3f))
+        Spacer(modifier = Modifier.fillMaxHeight(0.25f))
+
+        PageIndicator(pageCount = 2, currentPage = pagerState.currentPage)
+        Spacer(modifier = Modifier.height(20.dp))
 
         Icon(
             painter = painterResource(page.resIco),
@@ -115,17 +140,96 @@ fun OnboardingPageContent(
                 TextFieldFirstScreen(
                     textValue = nameValue,
                     onTextChange = onNameChange)
+                Spacer(modifier = Modifier.weight(0.9f))
+                ButtonContinue(
+                    textColor = textColor,
+                    buttonColor = buttonColor,
+                    modifier = Modifier
+                        .padding(vertical = 24.dp)
+                        .height(55.dp)
+                        .fillMaxWidth(0.9f),
+                    textOnButton = "Continue"
+                )
             }
             OnboardingPage.Second -> {
                 TextFieldSecondScreen(
                     textValue = pagesValue,
                     onTextChange = onPagesChange
                     )
+
+                Spacer(modifier = Modifier.height(10.dp))
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(0.95f),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    CountButton("10", modifier = Modifier.weight(1f),
+                        onClickButton = onPagesChange,
+                        isSelected = "10" == pagesSelected)
+                    CountButton("20", modifier = Modifier.weight(1f),
+                        onClickButton = onPagesChange,
+                        isSelected = "20" == pagesSelected)
+                    CountButton(
+                        "50", modifier = Modifier.weight(1f),
+                        onClickButton = onPagesChange,
+                        isSelected = "50" == pagesSelected
+                    )
+                }
+                Spacer(modifier = Modifier.weight(0.9f))
+                ButtonGetBack(
+                    textColor = Color.DarkGray,
+                    textOnButton = "Back"
+                )
+                ButtonContinue(
+                    textColor = textButtonColor,
+                    buttonColor = buttonPagesColor,
+                    modifier = Modifier
+                        .padding(vertical = 24.dp)
+                        .height(55.dp)
+                        .fillMaxWidth(0.9f),
+                    textOnButton = "Get Started"
+                )
+
+
+                
+                
+
             }
         }
 
+
+
     }
 }
+
+@Composable
+fun PageIndicator(pageCount: Int, currentPage: Int) {
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
+        repeat(pageCount){
+            IndicatorSingleRow(isSelected = it == currentPage)
+        }
+    }
+}
+
+
+@Composable
+fun IndicatorSingleRow(isSelected: Boolean){
+    val width = animateDpAsState(65.dp)
+    Box(
+        modifier = Modifier
+            .padding(2.dp)
+            .height(7.dp)
+            .width(width.value)
+            .clip(shape = RoundedCornerShape(25.dp))
+            .background(if (isSelected) lightGreen else slateGray)
+
+    )
+}
+
+
 
 @Composable
 fun TextFieldFirstScreen(
@@ -139,6 +243,7 @@ fun TextFieldFirstScreen(
             .border(1.2.dp, Color.Gray.copy(0.4f), RoundedCornerShape(12.dp))
             .clip(shape = RoundedCornerShape(12.dp)),
         onValueChange = onTextChange,
+        maxLines = 1,
         placeholder = {
             Text(
                 text = "Enter your name",
@@ -170,13 +275,27 @@ fun TextFieldSecondScreen(
             .border(1.2.dp, Color.Gray.copy(0.4f), RoundedCornerShape(12.dp))
             .clip(shape = RoundedCornerShape(12.dp)),
         onValueChange = onTextChange,
+        maxLines = 1,
 
         placeholder = {
-            Text(
-                text = "20",
-                fontSize = 17.sp,
-                fontFamily = roboto,
-                color = slateGray.copy(0.7f),)
+            Row(modifier = Modifier
+                .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = "20",
+                    fontSize = 17.sp,
+                    fontFamily = roboto,
+                    color = slateGray.copy(0.7f),)
+
+                Text(
+                    text = "pages",
+                    fontSize = 17.sp,
+                    fontFamily = roboto,
+                    color = slateGray.copy(0.7f),)
+
+            }
         },
         shape = RoundedCornerShape(12.dp),
         colors = TextFieldDefaults.colors(
@@ -185,7 +304,81 @@ fun TextFieldSecondScreen(
             cursorColor = Color.Black,
             focusedContainerColor = colorBackgroundDefault,
             unfocusedContainerColor = colorBackgroundDefault,
-
             )
     )
+}
+
+@Composable
+fun ButtonContinue(
+    textColor: Color,
+    buttonColor: Color,
+    modifier: Modifier,
+    textOnButton: String,
+){
+    Button(onClick = {},
+        modifier = modifier,
+        shape = RoundedCornerShape(20.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = buttonColor,
+            contentColor = Color.Unspecified,
+        )
+
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Text(text = textOnButton,
+                fontFamily = robotoSemiBold,
+                fontSize = 16.sp,
+                color = textColor,
+            )
+            Spacer(modifier = Modifier.width(5.dp))
+            Icon(
+                painter = painterResource(R.drawable.ic_arrowright),
+                contentDescription = null,
+                tint = textColor,
+                modifier = Modifier.size(20.dp))
+        }
+    }
+}
+
+@Composable
+fun ButtonGetBack(
+    textColor: Color,
+    textOnButton: String,
+){
+    Text(text = textOnButton,
+        fontFamily = robotoSemiBold,
+        fontSize = 16.sp,
+        color = textColor,
+    )
+}
+
+@Composable
+fun CountButton(
+    textOfPages: String,
+    modifier: Modifier = Modifier,
+    onClickButton: (String) -> Unit,
+    isSelected: Boolean,
+){
+    Button(
+        onClick = { onClickButton(textOfPages) },
+        shape = RoundedCornerShape(15.dp),
+        modifier = modifier
+            .height(55.dp),
+        colors = ButtonColors(
+            containerColor = if (isSelected) lightGreen.copy(0.2f) else Color.LightGray.copy(0.1f),
+            contentColor = if (isSelected) lightGreen else Color.DarkGray,
+            disabledContentColor = Color.Transparent,
+            disabledContainerColor = Color.Transparent,
+        ),
+        border = BorderStroke(width = if (isSelected) 2.dp else 1.dp, color = if (isSelected) lightGreen else Color.LightGray)
+
+    ) {
+        Text(text = textOfPages,
+            fontFamily = robotoSemiBold,
+            fontSize = 16.sp,
+        )
+    }
 }

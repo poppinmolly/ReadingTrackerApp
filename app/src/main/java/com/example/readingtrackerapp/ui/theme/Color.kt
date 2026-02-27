@@ -13,8 +13,8 @@ val buttonGradient = listOf(
     Color(0xFF00D856),
     Color(0xFF00B341)
 )
-val lightGray = Color(0xFFF5F6FA)
-val slateGray = Color(0xFF4B5563)
+val lightGray = Color(0xFFB9B9B9)
+val slateGray = Color(0xFF8A8B8E)
 val stroke = Color(0x1A374151)
 val cardGradientGreen = listOf(
     Color(0xFF16C85C),

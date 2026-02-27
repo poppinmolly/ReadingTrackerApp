@@ -12,17 +12,18 @@ import javax.inject.Inject
 class OnboardingScreenViewModel @Inject constructor(): ViewModel(){
     var nameValue by mutableStateOf("")
         private set
-
     var pagesValue by mutableStateOf("")
         private set
-
+    var pagesSelected by mutableStateOf("")
     fun onNameChange(newName: String){
         nameValue = newName
     }
 
     fun onPagesChange(newPages: String){
         pagesValue = newPages
+        pagesSelected = newPages
     }
+
 
 
 }
