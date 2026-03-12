@@ -17,7 +17,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             ReadingTrackerAppTheme {
-                OnboardingScreen()
+                HomeScreen()
             }
         }
     }

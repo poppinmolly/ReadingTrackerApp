@@ -44,6 +44,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -56,6 +57,7 @@ import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -63,14 +65,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.example.readingtrackerapp.R
+import com.example.readingtrackerapp.data.local.datastore.DataStoreManager
 import com.example.readingtrackerapp.data.local.entity.BookDetail
 import com.example.readingtrackerapp.presentation.navigation.AppNavHost
 import com.example.readingtrackerapp.presentation.navigation.Destination
+import com.example.readingtrackerapp.presentation.screens.Onboarding.OnboardingScreenViewModel
 import com.example.readingtrackerapp.ui.theme.backgroundButton
 import com.example.readingtrackerapp.ui.theme.buttonGradient
 import com.example.readingtrackerapp.ui.theme.cardGradientGreen
@@ -84,7 +90,7 @@ import com.example.readingtrackerapp.ui.theme.robotoMedium
 import com.example.readingtrackerapp.ui.theme.robotoSemiBold
 import com.example.readingtrackerapp.ui.theme.slateGray
 import com.example.readingtrackerapp.ui.theme.stroke
-
+import dagger.hilt.android.qualifiers.ActivityContext
 
 
 @Composable
@@ -103,13 +109,17 @@ fun HomeScreenUi(
     ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
+    val onBoardingViewModel: OnboardingScreenViewModel = viewModel()
+
+
+    val isOnboardingComplete by onBoardingViewModel.isOnboardingComplete.collectAsStateWithLifecycle()
     Scaffold(
         modifier = Modifier
             .fillMaxSize(),
         topBar = { TopBarPreview() },
         bottomBar = {
             NavigationBar(windowInsets = NavigationBarDefaults.windowInsets)  {
-                Destination.entries.forEach { destination ->
+                Destination.entries.filter { it != Destination.ONBOARDING }.forEach { destination ->
                     NavigationBarItem(
                         selected = currentRoute == destination.route,
                         onClick = {
@@ -142,7 +152,10 @@ fun HomeScreenUi(
             }
         }
     ) { padding ->
-        AppNavHost(navController = navController, startDestination = Destination.HOME, modifier = Modifier.padding(padding))
+        AppNavHost(
+            navController = navController,
+            startDestination = if (isOnboardingComplete) Destination.HOME else Destination.ONBOARDING,
+            modifier = Modifier.padding(padding))
     }
 }
 
@@ -152,6 +165,8 @@ fun HomeTabScreen(
     vm: HomeScreenViewModel = hiltViewModel()
 ) {
     val sheetState = rememberModalBottomSheetState()
+    val dataStoreManager: DataStoreManager = DataStoreManager(LocalContext.current)
+    val pagesGoal by dataStoreManager.pagesTarget.collectAsState(initial = "")
 
 
     val isSelected by vm.selectedBook
@@ -162,7 +177,7 @@ fun HomeTabScreen(
         Spacer(Modifier.height(10.dp))
 
 
-        Main()
+        Main(dailyPagesGoal = pagesGoal.toString())
         ReadingText(vm.booksReadingCounter.toString())
         LaunchedEffect(Unit) {
             vm.getAllReadingBooks()
@@ -272,7 +287,9 @@ fun TopBarPreview(){
 
 }
 @Composable
-fun Main() {
+fun Main(
+    dailyPagesGoal: String,
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -377,7 +394,7 @@ fun Main() {
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = "Daily Goal: 50 pages",
+                            text = "Daily Goal: $dailyPagesGoal pages",
                             fontSize = 14.sp,
                             color = fontGrayColor,
                             fontFamily = roboto

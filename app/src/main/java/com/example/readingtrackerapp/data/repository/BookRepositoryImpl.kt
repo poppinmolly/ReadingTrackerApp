@@ -72,7 +72,7 @@ class BookRepositoryImpl @Inject constructor(
 
     override fun getStatForLastWeek(lastSevenDays: Long): Flow<WeeklyStatsModel> = flow {
         val weeklyDays = statsDao.getLastWeekStats(lastSevenDays)
-        val days = System.currentTimeMillis() - weeklyDays[0].date
+        val days = if (weeklyDays.isNotEmpty())System.currentTimeMillis() - weeklyDays[0].date else 0
         val streakDays = if (days.toInt() / 86400000 == 0) 1 else days / 86400000
         val total = weeklyDays.sumOf { it.readPages }
 

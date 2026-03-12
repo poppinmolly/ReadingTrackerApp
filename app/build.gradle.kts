@@ -93,5 +93,8 @@ dependencies {
     //Material3
     implementation("androidx.compose.material3:material3:1.2.0")
 
+    // Preferences DataStore (SharedPreferences like APIs)
+    implementation("androidx.datastore:datastore-preferences:1.2.0")
+
 
 }

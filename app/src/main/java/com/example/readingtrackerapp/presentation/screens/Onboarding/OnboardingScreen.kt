@@ -4,6 +4,7 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,6 +31,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -48,16 +50,21 @@ import com.example.readingtrackerapp.ui.theme.robotoExtraBold
 import com.example.readingtrackerapp.ui.theme.robotoMedium
 import com.example.readingtrackerapp.ui.theme.robotoSemiBold
 import com.example.readingtrackerapp.ui.theme.slateGray
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
 @Composable
 fun OnboardingScreen(
-    vm: OnboardingScreenViewModel = hiltViewModel()
+    vm: OnboardingScreenViewModel = hiltViewModel(),
+    onFinish: () -> Unit
 ){
     val pages = listOf(
         OnboardingPage.First,
         OnboardingPage.Second
 
     )
+
+    val coroutineScope = rememberCoroutineScope()
     val pagerState = rememberPagerState(pageCount = {pages.size})
     HorizontalPager(state = pagerState) { pageIndex ->
         val page = pages[pageIndex]
@@ -69,7 +76,17 @@ fun OnboardingScreen(
             onPagesChange = vm::onPagesChange,
             pagesValue = vm.pagesValue,
             pagerState = pagerState,
-            pagesSelected = vm.pagesSelected
+            pagesSelected = vm.pagesSelected,
+            onContinueClick = {coroutineScope.launch {
+                pagerState.animateScrollToPage(pagerState.currentPage +1)
+            }},
+            onBackClick = {coroutineScope.launch {
+                pagerState.animateScrollToPage(pagerState.currentPage -1)
+                                                }},
+            onClickGetStarted = vm::onboardingComplete,
+            onFinish = onFinish,
+
+
             )
     }
 }
@@ -83,6 +100,10 @@ fun OnboardingPageContent(
     pagesValue: String,
     pagerState: PagerState,
     pagesSelected: String,
+    onContinueClick: () -> Unit,
+    onBackClick: () -> Unit,
+    onClickGetStarted: () -> Unit,
+    onFinish: () -> Unit,
 
 
 
@@ -148,7 +169,8 @@ fun OnboardingPageContent(
                         .padding(vertical = 24.dp)
                         .height(55.dp)
                         .fillMaxWidth(0.9f),
-                    textOnButton = "Continue"
+                    textOnButton = "Continue",
+                    onClickButton = {onContinueClick()}
                 )
             }
             OnboardingPage.Second -> {
@@ -179,7 +201,8 @@ fun OnboardingPageContent(
                 Spacer(modifier = Modifier.weight(0.9f))
                 ButtonGetBack(
                     textColor = Color.DarkGray,
-                    textOnButton = "Back"
+                    textOnButton = "Back",
+                    onBackClick = onBackClick
                 )
                 ButtonContinue(
                     textColor = textButtonColor,
@@ -188,7 +211,11 @@ fun OnboardingPageContent(
                         .padding(vertical = 24.dp)
                         .height(55.dp)
                         .fillMaxWidth(0.9f),
-                    textOnButton = "Get Started"
+                    textOnButton = "Get Started",
+                    onClickButton = {
+                        onClickGetStarted()
+                        onFinish()
+                    }
                 )
 
 
@@ -314,8 +341,9 @@ fun ButtonContinue(
     buttonColor: Color,
     modifier: Modifier,
     textOnButton: String,
+    onClickButton: () -> Unit,
 ){
-    Button(onClick = {},
+    Button(onClick = onClickButton,
         modifier = modifier,
         shape = RoundedCornerShape(20.dp),
         colors = ButtonDefaults.buttonColors(
@@ -347,11 +375,13 @@ fun ButtonContinue(
 fun ButtonGetBack(
     textColor: Color,
     textOnButton: String,
+    onBackClick: () -> Unit
 ){
     Text(text = textOnButton,
         fontFamily = robotoSemiBold,
         fontSize = 16.sp,
         color = textColor,
+        modifier = Modifier.clickable{onBackClick()}
     )
 }
 

@@ -7,4 +7,5 @@ enum class Destination(val route: String, val label: String, val icon: Int,) {
     EXPLORE("explore", "Explore", R.drawable.ic_explore),
     READING("reading", "Reading", R.drawable.ic_reading),
     PROFILE("profile", "Profile", R.drawable.ic_profile),
+    ONBOARDING("onboarding", "onboarding", R.drawable.ic_arrowright)
 }

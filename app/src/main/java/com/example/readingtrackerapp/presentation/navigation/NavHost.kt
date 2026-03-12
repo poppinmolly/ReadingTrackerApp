@@ -8,6 +8,7 @@ import androidx.navigation.compose.composable
 import com.example.readingtrackerapp.presentation.screens.Explore.ExploreScreen
 import com.example.readingtrackerapp.presentation.screens.Explore.ExploreScreenUi
 import com.example.readingtrackerapp.presentation.screens.Home.HomeTabScreen
+import com.example.readingtrackerapp.presentation.screens.Onboarding.OnboardingScreen
 import com.example.readingtrackerapp.presentation.screens.Profile.ProfileScreen
 import com.example.readingtrackerapp.presentation.screens.Reading.ReadingScreen
 
@@ -29,6 +30,13 @@ fun AppNavHost(
                     Destination.EXPLORE -> ExploreScreen()
                     Destination.READING -> ReadingScreen()
                     Destination.PROFILE -> ProfileScreen()
+                    Destination.ONBOARDING -> OnboardingScreen(
+                        onFinish = {
+                            navController.navigate(Destination.HOME.route){
+                                popUpTo(Destination.ONBOARDING.route){inclusive = true }
+                            }
+                        }
+                    )
                 }
             }
         }
