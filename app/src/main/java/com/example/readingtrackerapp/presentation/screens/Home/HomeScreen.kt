@@ -167,6 +167,7 @@ fun HomeTabScreen(
     val sheetState = rememberModalBottomSheetState()
     val dataStoreManager: DataStoreManager = DataStoreManager(LocalContext.current)
     val pagesGoal by dataStoreManager.pagesTarget.collectAsState(initial = "")
+    val readingPagesToday by vm.pagesRead.collectAsStateWithLifecycle(initialValue = 0)
 
 
     val isSelected by vm.selectedBook
@@ -177,7 +178,10 @@ fun HomeTabScreen(
         Spacer(Modifier.height(10.dp))
 
 
-        Main(dailyPagesGoal = pagesGoal.toString())
+        Main(
+            dailyPagesGoal = pagesGoal.toString(),
+            readPagesToday = readingPagesToday.toString()
+        )
         ReadingText(vm.booksReadingCounter.toString())
         LaunchedEffect(Unit) {
             vm.getAllReadingBooks()
@@ -289,6 +293,7 @@ fun TopBarPreview(){
 @Composable
 fun Main(
     dailyPagesGoal: String,
+    readPagesToday: String,
 ) {
     Column(
         modifier = Modifier
@@ -319,7 +324,7 @@ fun Main(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(215.dp) // підігнано під твій приклад
+                .height(215.dp)
                 .clip(RoundedCornerShape(20.dp))
                 .background(greenGradient)
         ) {
@@ -370,7 +375,7 @@ fun Main(
 
                     Row(verticalAlignment = Alignment.Bottom) {
                         Text(
-                            text = "47",
+                            text = readPagesToday,
                             fontSize = 60.sp,
                             color = Color.White,
                             fontFamily = robotoSemiBold,

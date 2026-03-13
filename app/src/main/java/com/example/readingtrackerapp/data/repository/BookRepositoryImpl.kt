@@ -9,15 +9,20 @@ import com.example.readingtrackerapp.data.local.entity.DailySession
 import com.example.readingtrackerapp.data.mapper.toDomain
 import com.example.readingtrackerapp.data.mapper.toEntity
 import com.example.readingtrackerapp.domain.model.Book
+import com.example.readingtrackerapp.domain.model.ReadingData
 import com.example.readingtrackerapp.domain.model.TotalStatsModel
 import com.example.readingtrackerapp.domain.model.WeeklyStatsModel
 import com.example.readingtrackerapp.domain.repository.BookRepository
+import com.example.readingtrackerapp.presentation.screens.Home.ReadingText
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
+import java.time.LocalDate
 import javax.inject.Inject
+import javax.inject.Singleton
 
-
+@Singleton
 class BookRepositoryImpl @Inject constructor(
     val dataSource: BooksRemoteDataSource,
     var  bookDao: BookDao,
@@ -84,6 +89,25 @@ class BookRepositoryImpl @Inject constructor(
             dailyAverage = average,
             readingTime = readingTime
         ))
+    }
+
+    private val readingData = MutableStateFlow(
+        ReadingData(
+            pagesReadToday = 0,
+            lastReadPages = LocalDate.now()
+        )
+    )
+
+    override suspend fun addTodayReadPages(pages: Int) {
+        readingData.value = readingData.value.copy(
+            pagesReadToday = readingData.value.pagesReadToday + pages,
+            lastReadPages = LocalDate.now()
+        )
+    }
+
+
+    override fun getReadingPagesToday(): Flow<ReadingData> {
+        return readingData
     }
 
 
