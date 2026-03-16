@@ -573,13 +573,13 @@ fun ReadingBookCard(book: BookDetail, onClick: () -> Unit){
             Column(
                 verticalArrangement = Arrangement.Bottom,
             ) {
-                Text(text = book.bookTitle,
+                Text(text = if(book.bookTitle.length > 25) book.bookTitle.take(25) + "..." else book.bookTitle,
                     fontFamily = robotoMedium,
                     fontSize = 17.sp,
 
                 )
 
-                Text(text = book.bookAuthor,
+                Text(text = if(book.bookAuthor.length > 25) book.bookTitle.take(25) + "..." else book.bookAuthor,
                     fontFamily = roboto,
                     fontSize = 14.sp,
                     color = slateGray,
@@ -627,7 +627,8 @@ fun ReadingBookCard(book: BookDetail, onClick: () -> Unit){
 
 fun calculatePercent(atNow: Int, total: Int): String {
     if (total == 0) return "0%"
-    return ((atNow.toFloat() / total.toFloat()) * 100).toInt().toString() + "%"
+    val result = ((atNow.toFloat() / total.toFloat()) * 100).toInt()
+    return if (result < 100) "$result%" else "100%"
 }
 
 fun calculateProgress(current: Int, total: Int): Float {

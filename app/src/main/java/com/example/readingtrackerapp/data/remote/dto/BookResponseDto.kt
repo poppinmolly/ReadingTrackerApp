@@ -12,7 +12,7 @@ data class VolumeInfoDto(
     val title: String?,
     val authors: List<String>?,
     val pageCount: Int?,
-    val averageRating: Double?,
+    val averageRating: Double? ,
     val description: String?,
     val imageLinks: ImageLinksDto?
 )
