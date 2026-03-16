@@ -20,7 +20,9 @@ interface BookRepository{
 
     fun getStatForLastWeek(lastSevenDays: Long): Flow<WeeklyStatsModel>
 
-    suspend fun addTodayReadPages(pages: Int)
+    suspend fun saveProgressReadingToday(pages: Int)
 
-    fun getReadingPagesToday(): Flow<ReadingData>
+    fun getReadingProgressToday(): Flow<ReadingData>
+
+    suspend fun checkDailyUserProgress()
 }

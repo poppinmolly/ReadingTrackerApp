@@ -4,6 +4,7 @@ import com.example.readingtrackerapp.data.datasource.BooksRemoteDataSource
 import com.example.readingtrackerapp.data.local.dao.BookDao
 import com.example.readingtrackerapp.data.local.dao.StatsDao
 import com.example.readingtrackerapp.data.local.database.BookDatabase
+import com.example.readingtrackerapp.data.local.datastore.DataStoreManager
 import com.example.readingtrackerapp.data.local.entity.BookDetail
 import com.example.readingtrackerapp.data.local.entity.DailySession
 import com.example.readingtrackerapp.data.mapper.toDomain
@@ -19,6 +20,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -27,7 +29,7 @@ class BookRepositoryImpl @Inject constructor(
     val dataSource: BooksRemoteDataSource,
     var  bookDao: BookDao,
     var statsDao: StatsDao,
-    val db: BookDatabase,
+    val dataStoreManager: DataStoreManager,
 ): BookRepository {
     override suspend fun getBook(title: String): List<Book> {
         val response = dataSource.getBook(title = title)
@@ -91,23 +93,16 @@ class BookRepositoryImpl @Inject constructor(
         ))
     }
 
-    private val readingData = MutableStateFlow(
-        ReadingData(
-            pagesReadToday = 0,
-            lastReadPages = LocalDate.now()
-        )
-    )
-
-    override suspend fun addTodayReadPages(pages: Int) {
-        readingData.value = readingData.value.copy(
-            pagesReadToday = readingData.value.pagesReadToday + pages,
-            lastReadPages = LocalDate.now()
-        )
+    override suspend fun saveProgressReadingToday(pages: Int) {
+        dataStoreManager.saveReadingProgress(pages = pages)
     }
 
+    override fun getReadingProgressToday(): Flow<ReadingData> {
+        return dataStoreManager.readingData
+    }
 
-    override fun getReadingPagesToday(): Flow<ReadingData> {
-        return readingData
+    override suspend fun checkDailyUserProgress() {
+        dataStoreManager.checkUserDailyProgress()
     }
 
 

@@ -7,8 +7,11 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.datastore.preferences.preferencesDataStoreFile
+import com.example.readingtrackerapp.domain.model.ReadingData
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 
 private const val DATA_STORE_NAME = "user_preferences"
 
@@ -21,6 +24,10 @@ class DataStoreManager (val context: Context){
         val ONBOARDING_COMPLETED = booleanPreferencesKey("ONBOARDING_COMPLETED")
         val NAME = stringPreferencesKey("NAME")
         val PAGES_TARGET = intPreferencesKey("PAGES_TARGET")
+
+        val CURRENT_STREAK = intPreferencesKey("CURRENT_STREAK")
+        val PAGES_READ_TODAY = intPreferencesKey("PAGES_READ_TODAY")
+        val LAST_READ_PAGES = stringPreferencesKey("LAST_READ_PAGES")
     }
 
     // READ
@@ -42,6 +49,51 @@ class DataStoreManager (val context: Context){
     suspend fun setPageTarget(pages: Int){
         context.dataStore.edit { it[PAGES_TARGET] = pages}
     }
+    // CREATE
+
+    val readingData: Flow<ReadingData> = context.dataStore.data.map { prefs ->
+        ReadingData(
+            pagesReadToday = prefs[PAGES_READ_TODAY] ?: 0,
+            currentReadingStreak = prefs[CURRENT_STREAK] ?: 0,
+            lastReadPages = prefs[LAST_READ_PAGES]?.let{ LocalDate.parse(it)} ?: LocalDate.now()
+        )
+    }
+
+    // EDIT
+    suspend fun saveReadingProgress(pages: Int){
+        val currentTime = LocalDate.now()
+        context.dataStore.edit { preferences ->
+            val lastDay = preferences[LAST_READ_PAGES]?.let { LocalDate.parse(it) } ?: currentTime
+            val daysDiff = ChronoUnit.DAYS.between(lastDay, currentTime)
+            val streak = preferences[CURRENT_STREAK] ?: 0
+
+            preferences[PAGES_READ_TODAY] = if (daysDiff == 0L) (preferences[PAGES_READ_TODAY] ?: 0 ) + pages  else {
+                0 + pages
+            }
+
+            preferences[CURRENT_STREAK] = when(daysDiff){
+                0L -> streak
+                1L -> streak + 1
+                else -> {0}
+            }
+
+            preferences[LAST_READ_PAGES] = currentTime.toString()
+        }
+    }
+
+    suspend fun checkUserDailyProgress() {
+        val currentTime = LocalDate.now()
+        context.dataStore.edit { preferences ->
+            val lastDay = preferences[LAST_READ_PAGES]?.let { LocalDate.parse(it) } ?: currentTime
+            val daysDiff = ChronoUnit.DAYS.between(lastDay, currentTime)
+
+            preferences[PAGES_READ_TODAY] =
+                if (daysDiff == 0L) (preferences[PAGES_READ_TODAY] ?: 0) else {
+                    0
+                }
+        }
+    }
+
 
 
 }

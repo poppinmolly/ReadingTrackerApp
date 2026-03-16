@@ -166,8 +166,8 @@ fun HomeTabScreen(
 ) {
     val sheetState = rememberModalBottomSheetState()
     val dataStoreManager: DataStoreManager = DataStoreManager(LocalContext.current)
-    val pagesGoal by dataStoreManager.pagesTarget.collectAsState(initial = "")
-    val readingPagesToday by vm.pagesRead.collectAsStateWithLifecycle(initialValue = 0)
+    val pagesGoal by dataStoreManager.pagesTarget.collectAsState(initial = 0)
+    val dataReadingToday by vm.todayReadProgress.collectAsStateWithLifecycle()
 
 
     val isSelected by vm.selectedBook
@@ -180,7 +180,8 @@ fun HomeTabScreen(
 
         Main(
             dailyPagesGoal = pagesGoal.toString(),
-            readPagesToday = readingPagesToday.toString()
+            readPagesToday = dataReadingToday?.pagesReadToday.toString(),
+            currentStreak = dataReadingToday?.currentReadingStreak.toString()
         )
         ReadingText(vm.booksReadingCounter.toString())
         LaunchedEffect(Unit) {
@@ -293,7 +294,8 @@ fun TopBarPreview(){
 @Composable
 fun Main(
     dailyPagesGoal: String,
-    readPagesToday: String,
+    readPagesToday: String?,
+    currentStreak: String,
 ) {
     Column(
         modifier = Modifier
@@ -375,7 +377,7 @@ fun Main(
 
                     Row(verticalAlignment = Alignment.Bottom) {
                         Text(
-                            text = readPagesToday,
+                            text = readPagesToday?: "0",
                             fontSize = 60.sp,
                             color = Color.White,
                             fontFamily = robotoSemiBold,
@@ -405,7 +407,10 @@ fun Main(
                             fontFamily = roboto
                         )
                         Text(
-                            text = "94%",
+                            text = calculatePercent(
+                                atNow = readPagesToday?.toIntOrNull() ?: 0,
+                                total = dailyPagesGoal.toIntOrNull() ?: 0,
+                            ),
                             fontSize = 14.sp,
                             color = fontGrayColor,
                             fontFamily = roboto
@@ -414,7 +419,12 @@ fun Main(
 
                     Spacer(modifier = Modifier.height(6.dp))
 
-                    // Progress bar (без зайвих padding всередині)
+
+                    // Progress bar
+                    val todayProgress = calculateProgress(
+                        current = readPagesToday?.toIntOrNull() ?: 0,
+                        total = dailyPagesGoal.toIntOrNull() ?: 0
+                    )
                     Box(
                         modifier = Modifier
                             .height(8.dp)
@@ -425,7 +435,7 @@ fun Main(
                         Box(
                             modifier = Modifier
                                 .fillMaxHeight()
-                                .fillMaxWidth(0.94f)
+                                .fillMaxWidth(todayProgress)
                                 .clip(RoundedCornerShape(40.dp))
                                 .background(Color.White)
                         )
@@ -443,6 +453,7 @@ fun Main(
 
                     Spacer(modifier = Modifier.height(12.dp))
 
+
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             painter = painterResource(R.drawable.ic_fire),
@@ -452,7 +463,7 @@ fun Main(
                         )
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
-                            text = "12 day streak",
+                            text = "$currentStreak day streak",
                             color = Color.White,
                             fontSize = 15.sp,
                             fontFamily = roboto
@@ -481,27 +492,7 @@ fun Main(
 }
 
 
-@Composable
-fun ProgressBar(
-    progress: Float,
-){
 
-    Box(
-        modifier = Modifier
-            .height(8.dp)
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp)
-            .clip(shape = RoundedCornerShape(40.dp))
-            .background(Color.White.copy(alpha = 0.35f))
-    ){
-        Box(modifier = Modifier
-            .fillMaxHeight()
-            .fillMaxWidth(progress)
-            .clip(shape = RoundedCornerShape(40.dp))
-            .background(Color.White)
-        )
-    }
-}
 @Composable
 fun ReadingText(
     readingBooks: String

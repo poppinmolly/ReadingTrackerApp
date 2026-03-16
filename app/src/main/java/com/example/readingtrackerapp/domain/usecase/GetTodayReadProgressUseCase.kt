@@ -5,11 +5,10 @@ import com.example.readingtrackerapp.domain.repository.BookRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class GetTodayReadPagesUseCase @Inject constructor(
+class GetTodayReadProgressUseCase @Inject constructor(
     private val repository: BookRepository
 ){
-    fun getReadingPages(): Flow<ReadingData> {
-        return repository.getReadingPagesToday()
+    fun getReadingData(): Flow<ReadingData> {
+        return repository.getReadingProgressToday()
     }
-
 }

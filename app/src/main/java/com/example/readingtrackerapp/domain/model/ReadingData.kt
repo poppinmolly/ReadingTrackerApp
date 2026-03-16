@@ -5,4 +5,5 @@ import java.time.LocalDate
 data class ReadingData(
     val pagesReadToday: Int,
     val lastReadPages: LocalDate,
+    val currentReadingStreak: Int = 0
 )

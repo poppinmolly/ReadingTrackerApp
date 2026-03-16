@@ -3,10 +3,11 @@ package com.example.readingtrackerapp.domain.usecase
 import com.example.readingtrackerapp.domain.repository.BookRepository
 import javax.inject.Inject
 
-class AddNewReadingPagesUseCase @Inject constructor(
+class ChangePagesReadTodayUseCase @Inject constructor(
     private val repository: BookRepository
 ){
-    suspend fun changeReadPages(pages: Int){
-        repository.addTodayReadPages(pages = pages)
+    suspend fun changeReadPagesTodayUseCase(pages: Int ){
+        repository.saveProgressReadingToday(pages = pages)
     }
+
 }
