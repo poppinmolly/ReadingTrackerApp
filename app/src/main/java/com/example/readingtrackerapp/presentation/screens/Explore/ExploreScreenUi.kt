@@ -51,7 +51,7 @@ import com.example.readingtrackerapp.ui.theme.stroke
 
 @Composable
 fun ExploreScreen(
-    vm: ExploreScreenViewModel = hiltViewModel()
+    vm: ExploreScreenViewModel = hiltViewModel(),
 ){
     ExploreScreenUi(
         textValue = vm.stateText,
@@ -60,7 +60,7 @@ fun ExploreScreen(
         textError = vm.error,
         books = vm.books.value,
         onClickAddButton = vm::addBookToReadList,
-        booksAdded = vm.booksAdded
+        booksAdded = vm.booksAdded,
     )
 }
 
@@ -73,7 +73,7 @@ fun ExploreScreenUi(
     textError: String?,
     books: List<Book>,
     onClickAddButton: (Book) -> Unit,
-    booksAdded: List<String>
+    booksAdded: List<String>,
 ){
     Column(
         modifier = Modifier

@@ -3,7 +3,6 @@ package com.example.readingtrackerapp.data.repository
 import com.example.readingtrackerapp.data.datasource.BooksRemoteDataSource
 import com.example.readingtrackerapp.data.local.dao.BookDao
 import com.example.readingtrackerapp.data.local.dao.StatsDao
-import com.example.readingtrackerapp.data.local.database.BookDatabase
 import com.example.readingtrackerapp.data.local.datastore.DataStoreManager
 import com.example.readingtrackerapp.data.local.entity.BookDetail
 import com.example.readingtrackerapp.data.local.entity.DailySession
@@ -14,13 +13,8 @@ import com.example.readingtrackerapp.domain.model.ReadingData
 import com.example.readingtrackerapp.domain.model.TotalStatsModel
 import com.example.readingtrackerapp.domain.model.WeeklyStatsModel
 import com.example.readingtrackerapp.domain.repository.BookRepository
-import com.example.readingtrackerapp.presentation.screens.Home.ReadingText
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
-import java.time.LocalDate
-import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -101,9 +95,11 @@ class BookRepositoryImpl @Inject constructor(
         return dataStoreManager.readingData
     }
 
-    override suspend fun checkDailyUserProgress() {
-        dataStoreManager.checkUserDailyProgress()
+    override suspend fun checkUserProgress() {
+        dataStoreManager.checkUserProgress()
     }
+
+
 
 
 }

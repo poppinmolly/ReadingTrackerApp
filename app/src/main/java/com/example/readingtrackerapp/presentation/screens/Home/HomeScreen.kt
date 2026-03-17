@@ -94,10 +94,10 @@ import dagger.hilt.android.qualifiers.ActivityContext
 
 
 @Composable
-fun HomeScreen(){
-    val navController = rememberNavController()
+fun HomeScreen(onOpenReadBooks:() -> Unit){
 
-    HomeScreenUi(navController)
+
+    HomeScreenUi(onOpenReadBooks)
 
 }
 
@@ -105,11 +105,12 @@ fun HomeScreen(){
 
 @Composable
 fun HomeScreenUi(
-    navController: NavHostController,
+    onOpenReadBooks:() -> Unit
     ) {
+    val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
-    val onBoardingViewModel: OnboardingScreenViewModel = viewModel()
+    val onBoardingViewModel: OnboardingScreenViewModel = hiltViewModel()
 
 
     val isOnboardingComplete by onBoardingViewModel.isOnboardingComplete.collectAsStateWithLifecycle()
@@ -155,7 +156,8 @@ fun HomeScreenUi(
         AppNavHost(
             navController = navController,
             startDestination = if (isOnboardingComplete) Destination.HOME else Destination.ONBOARDING,
-            modifier = Modifier.padding(padding))
+            modifier = Modifier.padding(padding),
+            onOpenReadBooks = onOpenReadBooks)
     }
 }
 

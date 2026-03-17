@@ -6,7 +6,6 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import androidx.datastore.preferences.preferencesDataStoreFile
 import com.example.readingtrackerapp.domain.model.ReadingData
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -28,6 +27,11 @@ class DataStoreManager (val context: Context){
         val CURRENT_STREAK = intPreferencesKey("CURRENT_STREAK")
         val PAGES_READ_TODAY = intPreferencesKey("PAGES_READ_TODAY")
         val LAST_READ_PAGES = stringPreferencesKey("LAST_READ_PAGES")
+
+        val BOOK_READ_TOTAL = intPreferencesKey("BOOK_READ_TOTAL")
+        val BEST_STREAK_ALL_TIME = intPreferencesKey("BEST_STREAK_ALL_TIME")
+
+
     }
 
     // READ
@@ -55,7 +59,10 @@ class DataStoreManager (val context: Context){
         ReadingData(
             pagesReadToday = prefs[PAGES_READ_TODAY] ?: 0,
             currentReadingStreak = prefs[CURRENT_STREAK] ?: 0,
-            lastReadPages = prefs[LAST_READ_PAGES]?.let{ LocalDate.parse(it)} ?: LocalDate.now()
+            lastReadPages = prefs[LAST_READ_PAGES]?.let{ LocalDate.parse(it)} ?: LocalDate.now(),
+            booksReadTotal = prefs[BOOK_READ_TOTAL] ?: 0,
+            bestStreakAllTime = prefs[BEST_STREAK_ALL_TIME] ?: 0,
+
         )
     }
 
@@ -81,11 +88,14 @@ class DataStoreManager (val context: Context){
         }
     }
 
-    suspend fun checkUserDailyProgress() {
+    suspend fun checkUserProgress() {
         val currentTime = LocalDate.now()
         context.dataStore.edit { preferences ->
             val lastDay = preferences[LAST_READ_PAGES]?.let { LocalDate.parse(it) } ?: currentTime
             val daysDiff = ChronoUnit.DAYS.between(lastDay, currentTime)
+            val bestStreak = preferences[BEST_STREAK_ALL_TIME] ?: 0
+            val streak = preferences[CURRENT_STREAK] ?: 0
+            preferences[BEST_STREAK_ALL_TIME] = (if (streak > bestStreak) streak else bestStreak)
 
             preferences[PAGES_READ_TODAY] =
                 if (daysDiff == 0L) (preferences[PAGES_READ_TODAY] ?: 0) else {
@@ -93,6 +103,10 @@ class DataStoreManager (val context: Context){
                 }
         }
     }
+
+
+
+
 
 
 

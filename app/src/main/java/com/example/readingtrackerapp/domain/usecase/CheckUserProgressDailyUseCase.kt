@@ -8,6 +8,6 @@ class CheckUserProgressDailyUseCase @Inject constructor(
     private val repository: BookRepository
 ){
     suspend fun checkUserProgressDailyUseCase(){
-        repository.checkDailyUserProgress()
+        repository.checkUserProgress()
     }
 }

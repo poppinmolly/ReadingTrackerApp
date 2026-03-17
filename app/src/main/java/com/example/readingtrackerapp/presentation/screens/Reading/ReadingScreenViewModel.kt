@@ -2,10 +2,13 @@ package com.example.readingtrackerapp.presentation.screens.Reading
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.readingtrackerapp.domain.model.ReadingData
 import com.example.readingtrackerapp.domain.model.TotalStatsModel
 import com.example.readingtrackerapp.domain.model.WeeklyStatsModel
+import com.example.readingtrackerapp.domain.usecase.CheckUserProgressDailyUseCase
 import com.example.readingtrackerapp.domain.usecase.GetAllTimeStatsUseCase
 import com.example.readingtrackerapp.domain.usecase.GetStatForLastWeekUseCase
+import com.example.readingtrackerapp.domain.usecase.GetTodayReadProgressUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -15,7 +18,9 @@ import javax.inject.Inject
 @HiltViewModel
 class ReadingScreenViewModel @Inject constructor(
     getAllTimeStatsUseCase: GetAllTimeStatsUseCase,
-    getStatForLastWeekUseCase: GetStatForLastWeekUseCase
+    getStatForLastWeekUseCase: GetStatForLastWeekUseCase,
+    getTodayReadProgressUseCase: GetTodayReadProgressUseCase,
+
 ): ViewModel(){
 
 
@@ -32,6 +37,17 @@ class ReadingScreenViewModel @Inject constructor(
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = null,
         )
+
+    val statsForAllTime = getTodayReadProgressUseCase.getReadingData().stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = null,
+
+    )
+
+
+
+
 
 
 

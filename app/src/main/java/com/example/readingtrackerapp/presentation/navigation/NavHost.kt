@@ -17,6 +17,7 @@ fun AppNavHost(
     navController: NavHostController,
     startDestination: Destination,
     modifier: Modifier = Modifier,
+    onOpenReadBooks: () -> Unit
 ){
     NavHost(
         navController, startDestination = startDestination.route, modifier = modifier
@@ -28,7 +29,7 @@ fun AppNavHost(
                         HomeTabScreen()
                     }
                     Destination.EXPLORE -> ExploreScreen()
-                    Destination.READING -> ReadingScreen()
+                    Destination.READING -> ReadingScreen(onClickAllBooksRead = onOpenReadBooks)
                     Destination.PROFILE -> ProfileScreen()
                     Destination.ONBOARDING -> OnboardingScreen(
                         onFinish = {

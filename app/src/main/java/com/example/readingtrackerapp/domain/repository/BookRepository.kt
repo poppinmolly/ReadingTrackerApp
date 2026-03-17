@@ -24,5 +24,7 @@ interface BookRepository{
 
     fun getReadingProgressToday(): Flow<ReadingData>
 
-    suspend fun checkDailyUserProgress()
+    suspend fun checkUserProgress()
+
+
 }

@@ -3,6 +3,7 @@ package com.example.readingtrackerapp.presentation.screens.Reading
 import android.R.attr.value
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -38,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.readingtrackerapp.R
 import com.example.readingtrackerapp.ui.model.ItemsModel
 import com.example.readingtrackerapp.ui.theme.cardGradientBlue
@@ -56,7 +58,8 @@ import com.example.readingtrackerapp.ui.theme.someLightPurple
 
 @Composable
 fun ReadingScreen(
-    vm: ReadingScreenViewModel = hiltViewModel()
+    vm: ReadingScreenViewModel = hiltViewModel(),
+    onClickAllBooksRead : () -> Unit,
 
 ){
     val totalStats = vm.totalReadStats.collectAsState().value
@@ -66,6 +69,8 @@ fun ReadingScreen(
     val weeklyPagesRead = dailyStats.value?.pagesRead
     val dailyAveragePagesReading = dailyStats.value?.dailyAverage
     val weeklyTimeReading = dailyStats.value?.readingTime
+
+    val allTimeReadingData by vm.statsForAllTime.collectAsStateWithLifecycle()
 
 
     val pagesReadModel = ItemsModel(
@@ -171,7 +176,7 @@ fun ReadingScreen(
                             }
                         }
                         Text(
-                            text = totalStats.totalBestStreak.toString(),
+                            text = allTimeReadingData?.currentReadingStreak.toString(),
                             color = Color.White,
                             fontSize = 30.sp,
                             fontFamily = robotoExtraBold,
@@ -195,6 +200,7 @@ fun ReadingScreen(
                         .height(160.dp)
                         .clip(shape = RoundedCornerShape(20.dp))
                         .background(blueGradient)
+                        .clickable{onClickAllBooksRead()}
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Surface(
@@ -288,7 +294,7 @@ fun ReadingScreen(
             TotalStat(
                 totalReadPages = totalStats.totalPagesRead,
                 totalBookRead = totalStats.totalReadingBooks,
-                totalBestStreak = totalStats.totalBestStreak
+                totalBestStreak = allTimeReadingData?.bestStreakAllTime ?: 0
             )
             Spacer(modifier = Modifier.height(20.dp))
         }
