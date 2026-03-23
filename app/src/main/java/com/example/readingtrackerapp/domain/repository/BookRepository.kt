@@ -1,6 +1,7 @@
 package com.example.readingtrackerapp.domain.repository
 
 import com.example.readingtrackerapp.data.local.entity.BookDetail
+import com.example.readingtrackerapp.data.local.entity.FinishedBooks
 import com.example.readingtrackerapp.domain.model.Book
 import com.example.readingtrackerapp.domain.model.ReadingData
 import com.example.readingtrackerapp.domain.model.TotalStatsModel
@@ -25,6 +26,10 @@ interface BookRepository{
     fun getReadingProgressToday(): Flow<ReadingData>
 
     suspend fun checkUserProgress()
+
+    suspend fun markBookAsFinished(book: BookDetail)
+
+    suspend fun getFinishedBooks(): List<FinishedBooks>
 
 
 }

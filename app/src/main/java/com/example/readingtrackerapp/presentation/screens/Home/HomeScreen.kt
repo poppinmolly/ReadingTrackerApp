@@ -1,7 +1,6 @@
 package com.example.readingtrackerapp.presentation.screens.Home
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -15,17 +14,14 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -40,34 +36,24 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
@@ -82,7 +68,6 @@ import com.example.readingtrackerapp.ui.theme.buttonGradient
 import com.example.readingtrackerapp.ui.theme.cardGradientGreen
 import com.example.readingtrackerapp.ui.theme.colorBackgroundDefault
 import com.example.readingtrackerapp.ui.theme.fontGrayColor
-import com.example.readingtrackerapp.ui.theme.lightGray
 import com.example.readingtrackerapp.ui.theme.lightGreen
 import com.example.readingtrackerapp.ui.theme.roboto
 import com.example.readingtrackerapp.ui.theme.robotoExtraBold
@@ -90,7 +75,6 @@ import com.example.readingtrackerapp.ui.theme.robotoMedium
 import com.example.readingtrackerapp.ui.theme.robotoSemiBold
 import com.example.readingtrackerapp.ui.theme.slateGray
 import com.example.readingtrackerapp.ui.theme.stroke
-import dagger.hilt.android.qualifiers.ActivityContext
 
 
 @Composable
@@ -201,7 +185,8 @@ fun HomeTabScreen(
                     onAddValue = vm::addValue,
                     onSubtractValue = vm::subtractValue,
                     readingValue = vm.readTitlesValue.value,
-                    onSaveProgress = vm::saveProgressReadingTitles
+                    onSaveProgress = vm::saveProgressReadingTitles,
+                    onClickFinishedBook = { vm.markBookAsFinished(book = vm.selectedBook.value) }
                 )
             }
         }
@@ -652,7 +637,14 @@ fun BookCover(url: String) {
 }
 
 @Composable
-fun BottomSheetUi(book: BookDetail?, onAddValue:() -> Unit, onSubtractValue:() -> Unit, readingValue: Int, onSaveProgress:() -> Unit) {
+fun BottomSheetUi(
+    book: BookDetail?,
+    onAddValue:() -> Unit,
+    onSubtractValue:() -> Unit,
+    readingValue: Int,
+    onSaveProgress:() -> Unit,
+    onClickFinishedBook: () -> Unit,
+) {
     val progress = calculateProgress(book?.readTitle ?: 0, book?.totalTitles ?: 0)
     val percent = calculatePercent(book?.readTitle ?: 0, book?.totalTitles ?: 0)
     Column(
@@ -857,7 +849,7 @@ fun BottomSheetUi(book: BookDetail?, onAddValue:() -> Unit, onSubtractValue:() -
         }
         Spacer(Modifier.height(8.dp))
         OutlinedButton(
-            onClick = {},
+            onClick = { onClickFinishedBook() },
             shape = RoundedCornerShape(20.dp),
             modifier = Modifier
                 .fillMaxWidth()

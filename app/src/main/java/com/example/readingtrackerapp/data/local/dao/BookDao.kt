@@ -21,4 +21,6 @@ interface BookDao{
     @Query("UPDATE books_db SET readTitle = readTitle + :titles WHERE id = :bookId")
     suspend fun addReadTitles(bookId: Long, titles: Int)
 
+
+
 }

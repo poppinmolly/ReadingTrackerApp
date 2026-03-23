@@ -2,10 +2,12 @@ package com.example.readingtrackerapp.data.repository
 
 import com.example.readingtrackerapp.data.datasource.BooksRemoteDataSource
 import com.example.readingtrackerapp.data.local.dao.BookDao
+import com.example.readingtrackerapp.data.local.dao.FinishedBooksDao
 import com.example.readingtrackerapp.data.local.dao.StatsDao
 import com.example.readingtrackerapp.data.local.datastore.DataStoreManager
 import com.example.readingtrackerapp.data.local.entity.BookDetail
 import com.example.readingtrackerapp.data.local.entity.DailySession
+import com.example.readingtrackerapp.data.local.entity.FinishedBooks
 import com.example.readingtrackerapp.data.mapper.toDomain
 import com.example.readingtrackerapp.data.mapper.toEntity
 import com.example.readingtrackerapp.domain.model.Book
@@ -15,6 +17,7 @@ import com.example.readingtrackerapp.domain.model.WeeklyStatsModel
 import com.example.readingtrackerapp.domain.repository.BookRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import java.time.LocalDate
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -23,6 +26,7 @@ class BookRepositoryImpl @Inject constructor(
     val dataSource: BooksRemoteDataSource,
     var  bookDao: BookDao,
     var statsDao: StatsDao,
+    val finishedBookDao: FinishedBooksDao,
     val dataStoreManager: DataStoreManager,
 ): BookRepository {
     override suspend fun getBook(title: String): List<Book> {
@@ -99,7 +103,20 @@ class BookRepositoryImpl @Inject constructor(
         dataStoreManager.checkUserProgress()
     }
 
+    override suspend fun markBookAsFinished(book: BookDetail) {
+        bookDao.deleteBook(book = book)
+        val finishedBook = FinishedBooks(
+            titleOfBook = book.bookTitle,
+            authorOfBook = book.bookAuthor,
+            dateOfFinished = System.currentTimeMillis(),
+            pagesRead = book.readTitle,
+        )
+        finishedBookDao.addFinishedBook(finishedBook = finishedBook)
+    }
 
+    override suspend fun getFinishedBooks(): List<FinishedBooks> {
+        return finishedBookDao.getFinishedBooks()
+    }
 
 
 }

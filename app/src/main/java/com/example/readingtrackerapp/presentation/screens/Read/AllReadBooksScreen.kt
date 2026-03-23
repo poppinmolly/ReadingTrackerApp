@@ -8,18 +8,26 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -29,8 +37,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.readingtrackerapp.R
 import com.example.readingtrackerapp.data.local.entity.BookDetail
+import com.example.readingtrackerapp.data.local.entity.FinishedBooks
 import com.example.readingtrackerapp.presentation.screens.Home.BookCover
 import com.example.readingtrackerapp.presentation.screens.Home.calculatePercent
 import com.example.readingtrackerapp.presentation.screens.Home.calculateProgress
@@ -46,20 +58,27 @@ import com.example.readingtrackerapp.ui.theme.slateGray
 import com.example.readingtrackerapp.ui.theme.someLightBlue
 import com.example.readingtrackerapp.ui.theme.stroke
 
+@Preview
 @Composable
 fun ReadScreen(){
     ReadScreenUi()
 }
 
 @Composable
-fun ReadScreenUi(){
+fun ReadScreenUi(
+    vm: AllReadBooksScreenViewModel = hiltViewModel(),
+){
+    val finishedBooks by vm.finishedBooks.collectAsStateWithLifecycle()
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .windowInsetsPadding(WindowInsets.systemBars),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         BottomText()
         RankCardElement()
-        ReadingBookCard()
+        Spacer(modifier = Modifier.padding(vertical = 10.dp))
+        ColumnViewReadBooks(books = finishedBooks)
     }
 
 }
@@ -210,7 +229,9 @@ fun RankCardElement(){
 }
 
 @Composable
-fun ReadingBookCard(){
+fun ReadingBookCard(
+    book: FinishedBooks
+){
 
     Surface(
         modifier = Modifier
@@ -233,13 +254,13 @@ fun ReadingBookCard(){
             Column(
                 verticalArrangement = Arrangement.spacedBy(10.dp),
             ) {
-                Text(text = "The Midnight Library",
+                Text(text = book.titleOfBook,
                     fontFamily = robotoMedium,
                     fontSize = 17.sp,
 
                     )
 
-                Text(text = "Matt Haig",
+                Text(text = book.authorOfBook,
                     fontFamily = roboto,
                     fontSize = 14.sp,
                     color = slateGray,
@@ -265,7 +286,7 @@ fun ReadingBookCard(){
                     }
                     Spacer(modifier = Modifier.width(5.dp))
                     Text(
-                        text = "304 pages",
+                        text = book.pagesRead.toString(),
                         fontFamily = roboto,
                         color = Color.DarkGray,
                         fontSize = 15.sp,
@@ -301,6 +322,25 @@ fun ReadingBookCard(){
 
 
             }
+        }
+    }
+}
+
+@Composable
+fun ColumnViewReadBooks(
+    books: List<FinishedBooks>
+){
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxWidth(0.9f)
+    ) {
+        items(
+            items = books,
+            key = null,
+            ){
+            book ->
+            ReadingBookCard(book)
+
         }
     }
 }

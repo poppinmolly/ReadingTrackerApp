@@ -9,10 +9,10 @@ import com.example.readingtrackerapp.domain.usecase.ChangePagesReadTodayUseCase
 import com.example.readingtrackerapp.domain.usecase.ChangeReadTitlesUseCase
 import com.example.readingtrackerapp.domain.usecase.CheckUserProgressDailyUseCase
 import com.example.readingtrackerapp.domain.usecase.GetTodayReadProgressUseCase
+import com.example.readingtrackerapp.domain.usecase.MarkBookAsFinishedUseCase
 import com.example.readingtrackerapp.domain.usecase.ShowAllAddedBooksUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -24,6 +24,7 @@ class HomeScreenViewModel @Inject constructor(
     private val getTodayReadProgressUseCase: GetTodayReadProgressUseCase,
     private val changePagesReadTodayUseCase: ChangePagesReadTodayUseCase,
     private val checkUserProgressDailyUseCase: CheckUserProgressDailyUseCase,
+    private val markBookAsFinishedUseCase: MarkBookAsFinishedUseCase,
 ): ViewModel(){
     var _readingBooksAtNow = mutableStateOf<List<BookDetail>>(emptyList())
     val readingBooksAtNow: State<List<BookDetail>> = _readingBooksAtNow
@@ -85,6 +86,7 @@ class HomeScreenViewModel @Inject constructor(
     fun getAllReadingBooks(){
         viewModelScope.launch {
             _readingBooksAtNow.value = getAllAddedBooksUseCase()
+            getAllReadingBooks()
         }
     }
 
@@ -93,6 +95,15 @@ class HomeScreenViewModel @Inject constructor(
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = null,
     )
+
+    fun markBookAsFinished(book: BookDetail?){
+        if (book != null){
+            viewModelScope.launch {
+                markBookAsFinishedUseCase.markBookAsFinishedUseCase(book = book)
+            }
+        }
+
+    }
 
 
 
