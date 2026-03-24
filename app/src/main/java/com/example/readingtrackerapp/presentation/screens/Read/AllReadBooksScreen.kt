@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -26,8 +27,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -38,15 +37,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.readingtrackerapp.R
-import com.example.readingtrackerapp.data.local.entity.BookDetail
 import com.example.readingtrackerapp.data.local.entity.FinishedBooks
-import com.example.readingtrackerapp.presentation.screens.Home.BookCover
-import com.example.readingtrackerapp.presentation.screens.Home.calculatePercent
-import com.example.readingtrackerapp.presentation.screens.Home.calculateProgress
-import com.example.readingtrackerapp.ui.theme.backgroundButton
+import com.example.readingtrackerapp.domain.model.UserRankInfo
+import com.example.readingtrackerapp.domain.utills.UserRank
 import com.example.readingtrackerapp.ui.theme.cardGradientGreen
 import com.example.readingtrackerapp.ui.theme.fontGrayColor
 import com.example.readingtrackerapp.ui.theme.lightGreen
@@ -57,6 +52,7 @@ import com.example.readingtrackerapp.ui.theme.robotoSemiBold
 import com.example.readingtrackerapp.ui.theme.slateGray
 import com.example.readingtrackerapp.ui.theme.someLightBlue
 import com.example.readingtrackerapp.ui.theme.stroke
+import com.example.readingtrackerapp.presentation.components.BookCover
 
 @Preview
 @Composable
@@ -69,6 +65,9 @@ fun ReadScreenUi(
     vm: AllReadBooksScreenViewModel = hiltViewModel(),
 ){
     val finishedBooks by vm.finishedBooks.collectAsStateWithLifecycle()
+    val rankInfo by vm.rankInfo.collectAsStateWithLifecycle()
+
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -76,7 +75,7 @@ fun ReadScreenUi(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         BottomText()
-        RankCardElement()
+        RankCardElement(currentRank = rankInfo )
         Spacer(modifier = Modifier.padding(vertical = 10.dp))
         ColumnViewReadBooks(books = finishedBooks)
     }
@@ -108,10 +107,13 @@ fun BottomText(){
 
 
 @Composable
-fun RankCardElement(){
+fun RankCardElement(
+    currentRank: UserRankInfo?,
+){
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            .wrapContentSize()
             .padding(horizontal = 15.dp)
     ) {
         Spacer(modifier = Modifier.height(18.dp))
@@ -121,7 +123,7 @@ fun RankCardElement(){
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(180.dp)
+                .height(145.dp)
                 .clip(RoundedCornerShape(20.dp))
                 .background(greenGradient)
         ) {
@@ -154,75 +156,35 @@ fun RankCardElement(){
                     Row(verticalAlignment = Alignment.CenterVertically) {
 
                         Text(
-                            text = "Next Rank",
-                            fontSize = 14.sp,
-                            fontFamily = roboto,
+                            text = "Current rank",
+                            fontSize = 16.sp,
+                            fontFamily = robotoMedium,
                             color = fontGrayColor
                         )
                     }
-
                     Row(verticalAlignment = Alignment.Bottom) {
                         Text(
-                            text = "Reader",
+                            text = currentRank?.rank?.title.toString(),
                             fontSize = 30.sp,
                             color = Color.White,
                             fontFamily = robotoExtraBold,
                             lineHeight = 60.sp
                         )
                     }
-                }
-                // MIDDLE BLOCK (Goal + % + progress)
-                Column {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = "2 books to reach Reader!",
-                            fontSize = 14.sp,
+                            text = currentRank?.progress.toString(),
+                            fontSize = 16.sp,
                             color = fontGrayColor,
                             fontFamily = roboto
                         )
-                        Text(
-                            text = "45%",
-                            fontSize = 14.sp,
-                            color = fontGrayColor,
-                            fontFamily = roboto
-                        )
-                    }
-                    Spacer(modifier = Modifier.height(6.dp))
-                    // Progress bar
-                    Box(
-                        modifier = Modifier
-                            .height(8.dp)
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(40.dp))
-                            .background(Color.White.copy(alpha = 0.35f))
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxHeight()
-                                .fillMaxWidth(0.4f)
-                                .clip(RoundedCornerShape(40.dp))
-                                .background(Color.White)
-                        )
+
                     }
                 }
-                // BOTTOM BLOCK (divider + bottom row)
-                Column {
-                    Spacer(modifier = Modifier.height(12.dp))
 
-
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-
-                        Text(
-                            text = "1 of 3 books completed",
-                            color = Color.White,
-                            fontSize = 15.sp,
-                            fontFamily = roboto
-                        )
-                    }
-                }
             }
         }
     }
@@ -248,16 +210,15 @@ fun ReadingBookCard(
             verticalAlignment = Alignment.CenterVertically,
 
             ) {
-            BookCover("")
+            BookCover(book.thumbnail)
             Spacer(modifier = Modifier.width(15.dp))
 
             Column(
-                verticalArrangement = Arrangement.spacedBy(10.dp),
+                verticalArrangement = Arrangement.Center,
             ) {
                 Text(text = book.titleOfBook,
                     fontFamily = robotoMedium,
                     fontSize = 17.sp,
-
                     )
 
                 Text(text = book.authorOfBook,
@@ -266,7 +227,7 @@ fun ReadingBookCard(
                     color = slateGray,
 
                     )
-
+                Spacer(modifier = Modifier.height(5.dp))
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ){
@@ -286,12 +247,13 @@ fun ReadingBookCard(
                     }
                     Spacer(modifier = Modifier.width(5.dp))
                     Text(
-                        text = book.pagesRead.toString(),
+                        text = book.pagesRead.toString() + " pages",
                         fontFamily = roboto,
                         color = Color.DarkGray,
                         fontSize = 15.sp,
                     )
                 }
+                Spacer(modifier = Modifier.height(7.dp))
 
                 Row(
                     verticalAlignment = Alignment.CenterVertically
@@ -332,7 +294,9 @@ fun ColumnViewReadBooks(
 ){
     LazyColumn(
         modifier = Modifier
-            .fillMaxWidth(0.9f)
+            .fillMaxWidth(0.98f),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(15.dp)
     ) {
         items(
             items = books,
@@ -344,3 +308,4 @@ fun ColumnViewReadBooks(
         }
     }
 }
+

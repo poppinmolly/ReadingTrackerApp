@@ -24,7 +24,7 @@ import javax.inject.Singleton
 @Singleton
 class BookRepositoryImpl @Inject constructor(
     val dataSource: BooksRemoteDataSource,
-    var  bookDao: BookDao,
+    var bookDao: BookDao,
     var statsDao: StatsDao,
     val finishedBookDao: FinishedBooksDao,
     val dataStoreManager: DataStoreManager,
@@ -110,13 +110,16 @@ class BookRepositoryImpl @Inject constructor(
             authorOfBook = book.bookAuthor,
             dateOfFinished = System.currentTimeMillis(),
             pagesRead = book.readTitle,
+            thumbnail = book.thumbnail,
         )
         finishedBookDao.addFinishedBook(finishedBook = finishedBook)
+        dataStoreManager.incrementTotalReadBooks()
     }
 
     override suspend fun getFinishedBooks(): List<FinishedBooks> {
         return finishedBookDao.getFinishedBooks()
     }
+
 
 
 }

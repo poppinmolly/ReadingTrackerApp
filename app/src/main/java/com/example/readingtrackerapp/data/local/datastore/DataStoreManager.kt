@@ -1,6 +1,7 @@
 package com.example.readingtrackerapp.data.local.datastore
 
 import android.content.Context
+import androidx.datastore.dataStore
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
@@ -52,6 +53,13 @@ class DataStoreManager (val context: Context){
 
     suspend fun setPageTarget(pages: Int){
         context.dataStore.edit { it[PAGES_TARGET] = pages}
+    }
+
+    suspend fun incrementTotalReadBooks(){
+        context.dataStore.edit {
+            val current = it[BOOK_READ_TOTAL] ?: 0
+            it[BOOK_READ_TOTAL] = current + 1
+        }
     }
     // CREATE
 

@@ -9,7 +9,7 @@ import com.example.readingtrackerapp.data.local.entity.BookDetail
 import com.example.readingtrackerapp.data.local.entity.DailySession
 import com.example.readingtrackerapp.data.local.entity.FinishedBooks
 
-@Database(entities = [BookDetail::class, DailySession::class, FinishedBooks::class], version = 9)
+@Database(entities = [BookDetail::class, DailySession::class, FinishedBooks::class], version = 10)
 abstract class BookDatabase: RoomDatabase(){
     abstract fun bookDao(): BookDao
     abstract fun statsDao(): StatsDao

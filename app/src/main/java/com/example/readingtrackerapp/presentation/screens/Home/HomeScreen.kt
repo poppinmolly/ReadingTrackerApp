@@ -75,6 +75,7 @@ import com.example.readingtrackerapp.ui.theme.robotoMedium
 import com.example.readingtrackerapp.ui.theme.robotoSemiBold
 import com.example.readingtrackerapp.ui.theme.slateGray
 import com.example.readingtrackerapp.ui.theme.stroke
+import com.example.readingtrackerapp.presentation.components.BookCover
 
 
 @Composable
@@ -624,17 +625,7 @@ fun calculateProgress(current: Int, total: Int): Float {
     } else 0f
 }
 
-@Composable
-fun BookCover(url: String) {
-    AsyncImage(
-        model = url,
-        contentDescription = "Book cover",
-        modifier = Modifier
-            .size(height = 80.dp, width = 60.dp)
-            .clip(RoundedCornerShape(15.dp))
 
-    )
-}
 
 @Composable
 fun BottomSheetUi(

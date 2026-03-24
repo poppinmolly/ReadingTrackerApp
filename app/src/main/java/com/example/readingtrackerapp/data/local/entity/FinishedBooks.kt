@@ -2,7 +2,7 @@ package com.example.readingtrackerapp.data.local.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import java.time.LocalDate
+
 
 @Entity(tableName = "finished_books")
 data class FinishedBooks(

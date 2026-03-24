@@ -228,7 +228,7 @@ fun ReadingScreen(
                             }
                         }
                         Text(
-                            text = totalStats.totalReadingBooks.toString(),
+                            text = allTimeReadingData?.booksReadTotal.toString(),
                             color = Color.White,
                             fontSize = 30.sp,
                             fontFamily = robotoExtraBold,
@@ -293,7 +293,7 @@ fun ReadingScreen(
             Spacer(modifier = Modifier.height(10.dp))
             TotalStat(
                 totalReadPages = totalStats.totalPagesRead,
-                totalBookRead = totalStats.totalReadingBooks,
+                totalBookRead = allTimeReadingData?.booksReadTotal ?: 0,
                 totalBestStreak = allTimeReadingData?.bestStreakAllTime ?: 0
             )
             Spacer(modifier = Modifier.height(20.dp))

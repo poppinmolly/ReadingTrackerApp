@@ -4,8 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import com.example.readingtrackerapp.data.local.entity.DailySession
-import com.example.readingtrackerapp.domain.model.TotalStatsModel
-import kotlinx.coroutines.flow.Flow
+
 @Dao
 interface StatsDao {
     @Insert
@@ -18,4 +17,7 @@ interface StatsDao {
         SELECT * FROM sessions_db WHERE date >= :sevenDaysAgo
     """)
     suspend fun getLastWeekStats(sevenDaysAgo: Long): List<DailySession>
+
+    @Query("UPDATE sessions_db SET booksRead = booksRead + 1")
+    suspend fun addOneReadBook()
 }
