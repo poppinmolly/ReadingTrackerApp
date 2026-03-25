@@ -1,6 +1,7 @@
 package com.example.readingtrackerapp.ui.theme
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 
 val Purple80 = Color(0xFFD0BCFF)
@@ -12,6 +13,12 @@ val Pink40 = Color(0xFF7D5260)
 val buttonGradient = listOf(
     Color(0xFF00D856),
     Color(0xFF00B341)
+)
+
+val onboardingBackgroundGradient = Brush.verticalGradient(listOf(
+    Color(0xFFF1FDF4),
+    Color(0xFFF7FEF9),
+    Color(0xFFFDFFFD))
 )
 val lightGray = Color(0xFFB9B9B9)
 val slateGray = Color(0xFF8A8B8E)

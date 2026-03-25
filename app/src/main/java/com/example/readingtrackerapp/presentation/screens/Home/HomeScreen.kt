@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -34,6 +35,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -56,10 +58,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import coil.compose.AsyncImage
 import com.example.readingtrackerapp.R
 import com.example.readingtrackerapp.data.local.datastore.DataStoreManager
 import com.example.readingtrackerapp.data.local.entity.BookDetail
+import com.example.readingtrackerapp.presentation.components.BookCover
 import com.example.readingtrackerapp.presentation.navigation.AppNavHost
 import com.example.readingtrackerapp.presentation.navigation.Destination
 import com.example.readingtrackerapp.presentation.screens.Onboarding.OnboardingScreenViewModel
@@ -75,7 +77,6 @@ import com.example.readingtrackerapp.ui.theme.robotoMedium
 import com.example.readingtrackerapp.ui.theme.robotoSemiBold
 import com.example.readingtrackerapp.ui.theme.slateGray
 import com.example.readingtrackerapp.ui.theme.stroke
-import com.example.readingtrackerapp.presentation.components.BookCover
 
 
 @Composable
@@ -99,42 +100,47 @@ fun HomeScreenUi(
 
 
     val isOnboardingComplete by onBoardingViewModel.isOnboardingComplete.collectAsStateWithLifecycle()
+
+
     Scaffold(
         modifier = Modifier
             .fillMaxSize(),
-        topBar = { TopBarPreview() },
+        topBar = { if (isOnboardingComplete) TopBarPreview() },
+        contentWindowInsets = if (!isOnboardingComplete) WindowInsets(0) else ScaffoldDefaults.contentWindowInsets,
         bottomBar = {
-            NavigationBar(windowInsets = NavigationBarDefaults.windowInsets)  {
-                Destination.entries.filter { it != Destination.ONBOARDING }.forEach { destination ->
-                    NavigationBarItem(
-                        selected = currentRoute == destination.route,
-                        onClick = {
-                            navController.navigate(route = destination.route){
-                                launchSingleTop = true
-                                restoreState = true
-                                popUpTo(navController.graph.startDestinationId){
-                                    saveState = true
+            if (isOnboardingComplete){
+                NavigationBar(windowInsets = NavigationBarDefaults.windowInsets)  {
+                    Destination.entries.filter { it != Destination.ONBOARDING }.forEach { destination ->
+                        NavigationBarItem(
+                            selected = currentRoute == destination.route,
+                            onClick = {
+                                navController.navigate(route = destination.route){
+                                    launchSingleTop = true
+                                    restoreState = true
+                                    popUpTo(navController.graph.startDestinationId){
+                                        saveState = true
+                                    }
                                 }
-                            }
-                        },
-                        icon = {
-                            Icon(
-                                painter = painterResource(id = destination.icon),
-                                contentDescription = null,
-                                modifier = Modifier.size(20.dp),
+                            },
+                            icon = {
+                                Icon(
+                                    painter = painterResource(id = destination.icon),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(20.dp),
+                                )
+                            },
+                            label = {Text(destination.label,)},
+                            colors = NavigationBarItemDefaults.colors(
+                                selectedIconColor = lightGreen,
+                                selectedTextColor = lightGreen,
+                                unselectedIconColor = slateGray,
+                                unselectedTextColor = slateGray,
+                                indicatorColor = lightGreen.copy(alpha = 0.15f)
                             )
-                        },
-                        label = {Text(destination.label,)},
-                        colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = lightGreen,
-                            selectedTextColor = lightGreen,
-                            unselectedIconColor = slateGray,
-                            unselectedTextColor = slateGray,
-                            indicatorColor = lightGreen.copy(alpha = 0.15f)
                         )
-                    )
-                }
+                    }
 
+                }
             }
         }
     ) { padding ->
